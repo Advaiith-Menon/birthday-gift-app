@@ -19,6 +19,21 @@
       cursor: pointer;
     }
 
+    .back-btn {
+      position: fixed;
+      top: 5%;
+      font-size: 1.2em;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .back-btn:hover {
+      color: #000;
+    }
+
     .choice-btn {
       position: fixed;
       bottom: 5%;
@@ -30,14 +45,20 @@
       z-index: 10;
     }
 
+    #back-link {
+      left: 20%;
+      background-color: #FFA500;
+      color: white;
+    }
+
     #accept-btn {
-      left: 10%;
+      left: 15%;
       background-color: #4CAF50;
       color: white;
     }
 
     #think-btn {
-      left: 40%;
+      left: 45%;
       background-color: #FFA500;
       color: white;
     }
@@ -67,6 +88,7 @@
   <button id="accept-btn" class="choice-btn" style="display:none;">I accept it</button>
   <button id="think-btn" class="choice-btn" style="display:none;">I’ll think about it…</button>
   <button id="deny-btn" class="choice-btn" style="display:none;">I deny it</button>
+  <button href="/memory" id="back-link" class="back-btn" style="display:none;">⬅ Back to Home</button>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -78,8 +100,7 @@
       'comic_3.png',       // 3
       'comic_4.png',       // 4
       'comic_choice.png', // 5
-      'comic_5.png',  // 6
-      'comic_6.png'    // 7
+      'comic_5.png',    // 6
     ];
 
     let index = 0;
@@ -87,6 +108,7 @@
     const acceptBtn = document.getElementById('accept-btn');
     const thinkBtn = document.getElementById('think-btn');
     const denyBtn = document.getElementById('deny-btn');
+    const back_link = document.getElementById('back-link');
     const baseUrl = "{{ url_for('static', filename='comic_pages/') }}";
 
     // Update image and handle choice logic
@@ -107,7 +129,7 @@
 
     document.body.addEventListener('click', (e) => {
       // Prevent image change if buttons are visible
-      if (index === 5 || index === 6 || index === 7) return;
+      if (index === 5 ) return;
 
       const width = window.innerWidth;
       const clickX = e.clientX;
@@ -126,20 +148,28 @@
       btn.addEventListener('click', e => e.stopPropagation());
     });
 
-    acceptBtn.onclick = () => {
-      index = 6;
-      updateImage();
+
+      acceptBtn.onclick = () => {
+      imgElement.src = baseUrl + 'comic_6.png';
+      back_link.style.display = 'block'; // Show the back link
+      acceptBtn.style.display = 'none';
+        thinkBtn.style.display = 'none';
+        denyBtn.style.display = 'none';
       runConfetti();
       alert("You can't turn back from this moment. This is forever.");
-    };
+      };
 
     thinkBtn.onclick = () => {
-      index = 7;
+      index = 6;
       updateImage();
     };
 
     denyBtn.onclick = () => {
       alert("This option is not available.");
+    };
+
+    back_link.onclick = () => {
+      window.location.href = '/memory'; // Navigate back to memory page
     };
 
     function runConfetti() {
@@ -166,5 +196,7 @@
 
     updateImage();
   </script>
+
+
 </body>
 </html>
