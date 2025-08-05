@@ -42,3 +42,17 @@ h2 {
   background-color: #bb86fc;
   color: #000;
 }
+
+.back-btn {
+      display: block;
+      text-align: center;
+      margin-top: 40px;
+      color: #999;
+      font-size: 1rem;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      color: #000;
+    }
