@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Songs Playlist</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='memory.css') }}">
+</head>
+<body>
+  <div class="memory-container">
+    <h2>🎵 Songs Sung By Me</h2>
+    
+    <div class="audio-player">
+      <audio id="main-audio" controls>
+        <source id="audio-source" src="{{ url_for('static', filename='audio/song1.mp3') }}" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <ul class="playlist" id="playlist">
+      <li data-src="{{ url_for('static', filename='audio/song1.mp3') }}">🎤 Munbe Vaa</li>
+      <li data-src="{{ url_for('static', filename='audio/song2.mp3') }}">🎤 Ninakai njan paattu</li>
+      <li data-src="{{ url_for('static', filename='audio/song3.mp3') }}">🎤 Mozhikalum Mounangalum</li>
+      <li data-src="{{ url_for('static', filename='audio/song4.mp3') }}">🎤 Oru Venal Puzhayil</li>
+      <li data-src="{{ url_for('static', filename='audio/song5.mp3') }}">🎤 Kya hua tera wada</li>
+      <li data-src="{{ url_for('static', filename='audio/song6.mp3') }}">🎤 Parayathe ariyathe </li>
+    </ul>
+  </div>
+
+  <script src="{{ url_for('static', filename='playlist.js') }}"></script>
+</body>
+</html>

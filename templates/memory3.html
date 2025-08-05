@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Age Pic Generator</title>
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-image: url("/static/AD_pics/Aadhi_bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #000000;
+  text-align: center;
+} 
+
+    .container {
+      padding: 1rem;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      color: #000000;
+    }
+
+    .photo {
+      width: 100%;
+      max-height: 400px;
+      
+      object-fit: cover;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(36, 36, 36, 0.2);
+      transition: opacity 0.5s ease;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Age Pic Generator</h1>
+
+    <!-- Default image -->
+    <img id="agePhoto" src="/static/AD_pics/Aadhi1.jpg" alt="Photo at age" class="photo" />
+
+    <input type="range" id="ageSlider" min="1" max="10" step="1" value="1" list="tickmarks" />
+
+    <!-- This was missing -->
+    <p>Photo: <span id="ageLabel">1</span></p>
+
+  </div>
+
+  <script>
+    const ageSlider = document.getElementById("ageSlider");
+    const ageLabel = document.getElementById("ageLabel");
+    const agePhoto = document.getElementById("agePhoto");
+
+    // Map slider values to images
+    const ageImages = {
+      1: "/static/AD_pics/Aadhi1.jpg",
+      2: "/static/AD_pics/Aadhi2.jpg",
+      3: "/static/AD_pics/Aadhi3.jpg",
+      4: "/static/AD_pics/Aadhi4.jpg",
+      5: "/static/AD_pics/Aadhi5.jpg",
+      6: "/static/AD_pics/Aadhi6.jpg",
+      7: "/static/AD_pics/Aadhi7.jpg",
+      8: "/static/AD_pics/Aadhi8.jpg",
+      9: "/static/AD_pics/Aadhi9.jpg",
+      10: "/static/AD_pics/Aadhi10.jpg"
+    };
+
+    ageSlider.addEventListener("input", () => {
+      const age = ageSlider.value;
+      ageLabel.textContent = age;
+
+      if (ageImages[age]) {
+        agePhoto.style.opacity = 0;
+        setTimeout(() => {
+          agePhoto.src = ageImages[age];
+          agePhoto.style.opacity = 1;
+        }, 200);
+      }
+    });
+  </script>
+</body>
+</html>

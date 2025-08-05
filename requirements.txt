@@ -1,0 +1,4 @@
+Flask
+hypercorn
+waitress ; sys_platform == 'win32'  # Optional, for running locally on Windows
+python-dotenv

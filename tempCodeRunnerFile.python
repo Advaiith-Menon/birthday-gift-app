@@ -1,0 +1,19 @@
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import os
+
+# Access your token (ensure it's stored as an environment variable or directly paste it for quick test)
+token = os.environ["AM-HF"] # Use get, not () - avoids TypeError
+
+model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+
+# Load tokenizer and model
+tokenizer = AutoTokenizer.from_pretrained(model_id, token=token)
+model = AutoModelForCausalLM.from_pretrained(model_id, token=token)
+
+# Test a simple response generation
+input_text = "What is the capital of France?"
+inputs = tokenizer(input_text, return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=50)
+response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+print(response)
