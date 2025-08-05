@@ -1,67 +1,88 @@
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open("memory-app").then(cache => {
-      return cache.addAll([
-        "/",
-        "/static/style.css",
-        "/static/script.js",
-        "/manifest.json",
-        "/static/playlist.js",
-        "/static/unlock.js",
-        "/static/unlock.css",
-        "/static/memory.css",
-        "/static/memory1.js",
-        "/static/avatar_idle.jpg",
-        "/static/avatar1.jpg",
-        "/static/avatar2.jpg",
-        "/static/mem1.jpg",
-        "/static/mem2.jpg",
-        "/static/mem3.jpg",
-        "/static/comic_pages/comic_1.png",
-        "/static/comic_pages/comic_2.png",
-        "/static/comic_pages/comic_3.png",
-        "/static/comic_pages/comic_4.png",
-        "/static/comic_pages/comic_5.png", 
-        "/static/comic_pages/comic_6.png",
-        "/static/comic_pages/comic_cover.png",
-        "/static/comic_pages/comic_choice.png",
-        "/static/audio/song1.mp3",
-        "/static/audio/song2.mp3",
-        "/static/audio/song3.mp3",
-        "/static/audio/song4.mp3",
-        "/static/audio/song5.mp3",
-        "/static/audio/song6.mp3",  
-        "/static/AD_pics/Aadhi_bg.jpg",
-        "/static/AD_pics/Aadhi1.jpg",
-        "/static/AD_pics/Aadhi2.jpg",
-        "/static/AD_pics/Aadhi3.jpg",
-        "/static/AD_pics/Aadhi4.jpg",
-        "/static/AD_pics/Aadhi5.jpg",
-        "/static/AD_pics/Aadhi6.jpg",
-        "/static/AD_pics/Aadhi7.jpg",
-        "/static/AD_pics/Aadhi8.jpg",
-        "/static/AD_pics/Aadhi9.jpg",
-        "/static/AD_pics/Aadhi10.jpg",
-        "/static/memory_video.mp4",
-        "/templates/index.html",
-        "/templates/memory.html",
-        "/templates/memory1.html",
-        "/templates/memory2.html",
-        "/templates/memory3.html",
-        "/templates/memory4.html",
-        "/templates/memory5.html",
-        "/templates/memory6.html",
-        "/templates/unlock.html",
-        // Add all your other files here (html pages, images, etc.)
-      ]);
+const SHELL_CACHE_NAME = 'app-shell-v1';
+const MEDIA_CACHE_NAME = 'media-cache-v1';
+
+// Precache only the core app files
+const shellAssets = [
+  '/',
+  '/static/style.css',
+  '/static/script.js',
+  '/static/manifest.json',
+  '/static/playlist.js',
+  '/static/unlock.js',
+  '/static/unlock.css',
+  '/static/memory.css',
+  '/static/memory1.js',
+];
+
+// Install event: Precache the app shell
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(SHELL_CACHE_NAME).then(cache => {
+      console.log('[Service Worker] Pre-caching app shell');
+      return cache.addAll(shellAssets);
     })
   );
 });
 
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
+// Activate event: Clean up old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.filter(cacheName => {
+          return cacheName !== SHELL_CACHE_NAME && cacheName !== MEDIA_CACHE_NAME;
+        }).map(cacheName => {
+          return caches.delete(cacheName);
+        })
+      );
     })
   );
+  self.clients.claim();
+});
+
+// Fetch event: Use different strategies for different resources
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Strategy for app shell files: Cache-first
+  // Check if the request URL is one of our shell assets
+  if (url.origin === location.origin && shellAssets.includes(url.pathname)) {
+    event.respondWith(caches.match(event.request));
+    return;
+  }
+
+  // Strategy for media files: Cache-first, with network fallback and cache update
+  if (
+    url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.png') ||
+    url.pathname.endsWith('.mp4') ||
+    url.pathname.endsWith('.mp3')
+  ) {
+    event.respondWith(
+      caches.match(event.request).then(cachedResponse => {
+        // Return cached response if it exists
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        // If not, fetch from the network, cache it, and return it.
+        return fetch(event.request).then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200) {
+            return networkResponse;
+          }
+
+          const responseToCache = networkResponse.clone();
+          caches.open(MEDIA_CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+
+          return networkResponse;
+        });
+      })
+    );
+    return;
+  }
+
+  // Default strategy for all other requests: Network-first
+  event.respondWith(fetch(event.request));
 });
