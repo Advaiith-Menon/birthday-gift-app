@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- PWA Setup -->
-<link rel="manifest" href="/static/manifest.json">
-<meta name="theme-color" content="#FF4D6D">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
-
-<!-- Service Worker -->
-<script src="/static/js/main.js" defer></script>
-
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Headache-AI enhanced</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Headache-AI Enhanced</title>
+
+  <!-- PWA Meta Setup -->
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#FF4D6D" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+
+  <!-- Main Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-  <!-- Header at the very top -->
-  <div class="app-header">Headache-AI enhanced</div>
+  <!-- App Header -->
+  <div class="app-header">Headache-AI Enhanced</div>
 
   <!-- Chat Window -->
   <div id="chat-window">
@@ -37,6 +36,22 @@
     </div>
   </div>
 
+  <!-- Script -->
   <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
+          .then(reg => {
+            console.log('Service worker registered:', reg.scope);
+          })
+          .catch(err => {
+            console.error('Service worker registration failed:', err);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
