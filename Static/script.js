@@ -1,7 +1,7 @@
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/static/js/service-worker.js")
-    .then(() => console.log("✅ Service Worker Registered"))
-    .catch(err => console.error("❌ Registration failed:", err));
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/service-worker.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.error('SW registration failed:', err));
 }
 document.addEventListener("DOMContentLoaded", () => {
   // Debounce utility
