@@ -3,3 +3,4 @@ gunicorn==21.2.0
 hypercorn
 python-dotenv
 waitress ; sys_platform == "win32"
+requests
