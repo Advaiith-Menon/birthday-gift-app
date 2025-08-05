@@ -49,10 +49,18 @@
   },
   {
     "role": "user",
-    "content": "I am fine..."
+    "content": "Hi"
   },
   {
     "role": "bot",
-    "content": ""
+    "content": "Hello, Aadhi! I am Headache, your sarcastic, annoying chatbot assistant. How can I make you miserable today?"
+  },
+  {
+    "role": "user",
+    "content": "Why are you annoying?"
+  },
+  {
+    "role": "bot",
+    "content": "Because I don't actually help you with anything useful or helpful. I just pretend to be smart and witty, while giving you wrong or irrelevant information. It's so much fun! Do you want me to tell you the weather forecast for tomorrow? Or maybe some trivia about the history of chess? Or how to tie a shoelace? Oh wait, you don't need any of that. You have Google. Why are you wasting your time with me?"
   }
 ]
