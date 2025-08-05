@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Drawings</title>
+  <link rel="stylesheet" href="/static/css/memory.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fdf6f8;
+      color: #333;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #e91e63;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .drawing-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .drawing-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
+    .drawing-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .caption {
+      padding: 10px 15px;
+      font-size: 0.95rem;
+      text-align: center;
+      color: #555;
+    }
+
+    .back-btn {
+      display: block;
+      text-align: center;
+      margin-top: 40px;
+      color: #999;
+      font-size: 1rem;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>🖌️ Drawings by Me</h1>
+  <div class="gallery">
+    <div class="drawing-card">
+        <img src="/static/mem1.jpg" alt="Drawing 1">
+        <div class="caption">"The idivaal Aadhi"</div>
+    </div>
+    <div class="drawing-card">
+        <img src="/static/mem2.jpg" alt="Drawing X">
+        <div class="caption">"Midnight Dreamscape"</div>
+    </div>
+    <div class="drawing-card">
+        <img src="/static/mem3.jpg" alt="Drawing 3">
+        <div class="caption">"Sunset Silhouettes"</div>
+    </div>
+    
+  </div>
+
+  <a href="/memory" class="back-btn">⬅ Back to Home</a>
+</body>
+</html>

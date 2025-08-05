@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday!</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='unlock.css') }}" />
+</head>
+<body onload="launchConfetti()">
+  <div class="container">
+    <h1>🎊<br>Happy Birthday, Aadhi🎈! <br>🎂</h1>
+    <p class="message">You're amazing and I’m so lucky to have you in my life! 💖</p>
+
+   <button onclick="startCountdown()">Click here for your surprise 🎉</button>
+
+
+    <div class="note">
+      <p>I made this just for you, with love 💕</p>
+    </div>
+  </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="{{ url_for('static', filename='unlock.js') }}"></script>
+    <div id="countdownWrapper">5</div>
+</body>
+</html>

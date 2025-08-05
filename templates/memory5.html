@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Director Sir & Aadhi</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: sans-serif;
+    }
+
+    img {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .choice-btn {
+      position: fixed;
+      bottom: 5%;
+      font-size: 1.2em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    #accept-btn {
+      left: 10%;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #think-btn {
+      left: 40%;
+      background-color: #FFA500;
+      color: white;
+    }
+
+    #deny-btn {
+      left: 70%;
+      background-color: #DC143C;
+      color: white;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <img id="comic" src="{{ url_for('static', filename='comic_pages/comic_cover.png') }}" alt="comic page" />
+
+  <!-- Buttons (initially hidden) -->
+  <button id="accept-btn" class="choice-btn" style="display:none;">I accept it</button>
+  <button id="think-btn" class="choice-btn" style="display:none;">I’ll think about it…</button>
+  <button id="deny-btn" class="choice-btn" style="display:none;">I deny it</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const images = [
+      'comic_cover.png',   // 0
+      'comic_1.png',       // 1
+      'comic_2.png',       // 2
+      'comic_3.png',       // 3
+      'comic_4.png',       // 4
+      'comic_choice.png', // 5
+      'comic_5.png',  // 6
+      'comic_6.png'    // 7
+    ];
+
+    let index = 0;
+    const imgElement = document.getElementById('comic');
+    const acceptBtn = document.getElementById('accept-btn');
+    const thinkBtn = document.getElementById('think-btn');
+    const denyBtn = document.getElementById('deny-btn');
+    const baseUrl = "{{ url_for('static', filename='comic_pages/') }}";
+
+    // Update image and handle choice logic
+    function updateImage() {
+      imgElement.src = baseUrl + images[index];
+
+      // Show buttons only on final choice page
+      if (index === 5) {
+        acceptBtn.style.display = 'block';
+        thinkBtn.style.display = 'block';
+        denyBtn.style.display = 'block';
+      } else {
+        acceptBtn.style.display = 'none';
+        thinkBtn.style.display = 'none';
+        denyBtn.style.display = 'none';
+      }
+    }
+
+    document.body.addEventListener('click', (e) => {
+      // Prevent image change if buttons are visible
+      if (index === 5 || index === 6 || index === 7) return;
+
+      const width = window.innerWidth;
+      const clickX = e.clientX;
+
+      if (clickX > width / 2 && index < images.length - 1) {
+        index++;
+      } else if (clickX <= width / 2 && index > 0) {
+        index--;
+      }
+
+      updateImage();
+    });
+
+    // Prevent event bubbling on buttons
+    [acceptBtn, thinkBtn, denyBtn].forEach(btn => {
+      btn.addEventListener('click', e => e.stopPropagation());
+    });
+
+    acceptBtn.onclick = () => {
+      index = 6;
+      updateImage();
+      runConfetti();
+      alert("You can't turn back from this moment. This is forever.");
+    };
+
+    thinkBtn.onclick = () => {
+      index = 7;
+      updateImage();
+    };
+
+    denyBtn.onclick = () => {
+      alert("This option is not available.");
+    };
+
+    function runConfetti() {
+      const duration = 10 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 250, zIndex: 1000 };
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        confetti({
+          ...defaults,
+          particleCount: 100,
+          origin: {
+            x: Math.random(),
+            y: Math.random() * 0.5
+          }
+        });
+      }, 200);
+    }
+
+    updateImage();
+  </script>
+</body>
+</html>

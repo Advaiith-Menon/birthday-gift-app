@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memory Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(  #faaad5, #f68db7 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+      color: #333;
+    }
+
+    .main-heart {
+      position: relative;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .heart-svg {
+      width: 25vw;
+      height: auto;
+      fill: #e91e63;
+      animation: heartbeat 1.4s infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .heart-text {
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .text-boxes {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .text-box {
+      background-color: #ffe6eb;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background-color 0.3s;
+      position: relative;
+    }
+
+    .text-box:hover {
+      background-color: #ffd4dd;
+    }
+
+    .text-box h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #c2185b;
+    }
+
+    .content {
+      margin-top: 10px;
+      display: none;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .text-box.active .content {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-heart">
+    <svg class="heart-svg" viewBox="0 0 32 29.6">
+      <path d="M23.6,0c-3.4,0-6.4,2.6-7.6,4.1C14.8,2.6,11.8,0,8.4,0
+               C3.8,0,0,3.8,0,8.4c0,9.6,16,21.2,16,21.2s16-11.6,
+               16-21.2C32,3.8,28.2,0,23.6,0z"/>
+    </svg>
+    <div class="heart-text">Aadhi<br>My "True Love"</div>
+  </div>
+
+  <div class="text-boxes">
+    <div class="text-box">
+      <h3>Note 1: What is "True Love"?</h3>
+      <div class="content">Love that has nothing to do with physical attraction...<br>Feeling happy when you're happy, calm when you are around and missing you while you are not around. </div>
+    </div>
+
+    <div class="text-box">
+      <h3>Note 2: Why are you my "True Love"</h3>
+      <div class="content">Because I love you - Like father's Love towards his daughter...<br>You will always be my first daughter...</div>
+    </div>
+
+    <div class="text-box">
+      <h3>Note 3: Secret Thought: How to escape?</h3>
+      <div class="content">No escape routes found!!!<br>Stuck with my company for eternity!!!</div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle content visibility on click
+    document.querySelectorAll('.text-box').forEach(box => {
+      box.addEventListener('click', () => {
+        box.classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>
