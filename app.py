@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify , send_from_directory
 import requests
 import json
 import os
@@ -104,7 +104,10 @@ def memory5():
 @app.route("/memory6")
 def memory6():
     return render_template("memory6.html")
-
+@app.route("/image/<filename>")
+def get_image(filename):
+    # You could add extra security checks here (e.g. allowed extensions)
+    return send_from_directory(os.path.join(app.root_path, 'static'), filename)
 
 if __name__ == "__main__":
     app.run(debug=True)
