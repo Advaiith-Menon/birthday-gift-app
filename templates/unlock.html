@@ -4,7 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Happy Birthday!</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='unlock.css') }}" />
+  <style>body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #ffecd2, #fcb69f);
+  color: #333;
+  text-align: center;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 2.5em;
+  color: #e91e63;
+  animation: bounce 500ms ease infinite alternate;
+}
+
+.message {
+  font-size: 1.2em;
+  margin: 1rem 0;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background: #ff4081;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.gallery img {
+  width: 100px;
+  margin: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.note {
+  margin-top: 2rem;
+  font-style: italic;
+  color: #555;
+}
+#countdownWrapper {
+    position: absolute;
+    top: 70vh;
+    width: 100%;
+    right: 0.25vw;
+    text-align: center;  
+    font-size: 10vh;
+    font-weight: bold;
+    color: #ff4d6d;
+    font-family: 'Courier New', Courier, monospace;
+    animation: pulse 1s infinite;
+    display: none;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+}</style>
 </head>
 <body onload="launchConfetti()">
   <div class="container">
@@ -19,7 +88,53 @@
     </div>
   </div>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="{{ url_for('static', filename='unlock.js') }}"></script>
+    <script>function launchConfetti() {
+  const duration = 6 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 70, zIndex: 100 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  const interval = setInterval(function () {
+    const timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    confetti(Object.assign({}, defaults, {
+      particleCount: 400,
+      origin: {
+        x: randomInRange(0.1, 0.3),
+        y: Math.random() - 0.2
+      }
+    }));
+
+    confetti(Object.assign({}, defaults, {
+      particleCount: 50,
+      origin: {
+        x: randomInRange(0.7, 0.9),
+        y: Math.random() - 0.2
+      }
+    }));
+  }, 1000);
+}
+function startCountdown() {
+    launchConfetti()
+      const countdown = document.getElementById("countdownWrapper");
+      countdown.style.display = "block";
+      let counter = 5;
+      countdown.textContent = counter;
+
+      const interval = setInterval(() => {
+        counter--;
+        countdown.textContent = counter;
+        if (counter === 0) {
+          clearInterval(interval);
+          window.location.href = "/memory"; // Redirect to memory page
+        }
+      }, 1000);}</script>
     <div id="countdownWrapper">5</div>
 </body>
 </html>
