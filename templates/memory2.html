@@ -70,45 +70,45 @@
     <h2>🎵 Songs Sung By Me</h2>
     
     <div class="audio-player">
-      <audio id="main-audio" controls>
-        <source id="audio-source" src="{{ url_for('static', filename='audio/song1.mp3') }}" type="audio/mp3">
+      <!-- Simplified audio element: use only one src attribute -->
+      <audio id="main-audio" controls src="/static/audio/song1.mp3">
         Your browser does not support the audio element.
       </audio>
     </div>
 
     <ul class="playlist" id="playlist">
-      <li data-src="{{ url_for('static', filename='audio/song1.mp3') }}">🎤 Munbe Vaa</li>
-      <li data-src="{{ url_for('static', filename='audio/song2.mp3') }}">🎤 Ninakai njan paattu</li>
-      <li data-src="{{ url_for('static', filename='audio/song3.mp3') }}">🎤 Mozhikalum Mounangalum</li>
-      <li data-src="{{ url_for('static', filename='audio/song4.mp3') }}">🎤 Oru Venal Puzhayil</li>
-      <li data-src="{{ url_for('static', filename='audio/song5.mp3') }}">🎤 Kya hua tera wada</li>
-      <li data-src="{{ url_for('static', filename='audio/song6.mp3') }}">🎤 Parayathe ariyathe </li>
+      <li data-src="/static/audio/song1.mp3" class="active">🎤 Munbe Vaa</li>
+      <li data-src="/static/audio/song2.mp3">🎤 Ninakai njan paattu</li>
+      <li data-src="/static/audio/song3.mp3">🎤 Mozhikalum Mounangalum</li>
+      <li data-src="/static/audio/song4.mp3">🎤 Oru Venal Puzhayil</li>
+      <li data-src="/static/audio/song5.mp3">🎤 Kya hua tera wada</li>
+      <li data-src="/static/audio/song6.mp3">🎤 Parayathe ariyathe</li>
     </ul>
   </div>
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-  const playlist = document.getElementById("playlist");
-  const audio = document.getElementById("main-audio");
-  const source = document.getElementById("audio-source");
+    document.addEventListener("DOMContentLoaded", () => {
+      const playlist = document.getElementById("playlist");
+      const audio = document.getElementById("main-audio");
 
-  playlist.querySelectorAll("li").forEach(item => {
-    item.addEventListener("click", () => {
-      // Remove active from all
-      playlist.querySelectorAll("li").forEach(li => li.classList.remove("active"));
-      
-      // Set this as active
-      item.classList.add("active");
+      playlist.querySelectorAll("li").forEach(item => {
+        item.addEventListener("click", () => {
+          // Remove active class from all items
+          playlist.querySelectorAll("li").forEach(li => li.classList.remove("active"));
 
-      // Load new song
-      const newSrc = item.getAttribute("data-src");
-      source.src = newSrc;
-      audio.load();
-      audio.play();
+          // Set clicked item as active
+          item.classList.add("active");
+
+          // Change audio source and play
+          const newSrc = item.getAttribute("data-src");
+          audio.src = newSrc;
+          audio.load();
+          audio.play();
+        });
+      });
     });
-  });
-})
-</script>
-    <a href="/memory" class="back-btn">⬅ Back to Home</a>
+  </script>
+
+  <a href="/memory" class="back-btn">⬅ Back to Home</a>
 </body>
 </html>
