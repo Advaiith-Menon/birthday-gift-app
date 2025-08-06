@@ -104,7 +104,7 @@ def memory5():
 @app.route("/memory6")
 def memory6():
     return render_template("memory6.html")
-@app.route("/image/<filename>")
+@app.route("/static/<filename>")
 def get_image(filename):
     # You could add extra security checks here (e.g. allowed extensions)
     return send_from_directory(os.path.join(app.root_path, 'static'), filename)
