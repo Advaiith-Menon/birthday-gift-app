@@ -7,10 +7,8 @@ const shellAssets = [
   '/static/style.css',
   '/static/script.js',
   '/static/manifest.json',
-  '/static/playlist.js',
   '/static/unlock.js',
   '/static/unlock.css',
-  '/static/memory.css',
   '/static/memory1.js',
 ];
 
