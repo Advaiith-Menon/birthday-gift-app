@@ -71,21 +71,21 @@
     
     <div class="audio-player">
       <!-- Simplified audio element: use only one src attribute -->
-      <audio id="main-audio" controls src="/static/audio/song1.mp3">
+      <audio id="main-audio" controls src="{{ url_for('static', filename='audio/song1.mp3') }}">
         Your browser does not support the audio element.
       </audio>
     </div>
 
     <ul class="playlist" id="playlist">
-      <li data-src="/static/audio/song1.mp3" class="active">🎤 Munbe Vaa</li>
-      <li data-src="/static/audio/song2.mp3">🎤 Ninakai njan paattu</li>
-      <li data-src="/static/audio/song3.mp3">🎤 Mozhikalum Mounangalum</li>
-      <li data-src="/static/audio/song4.mp3">🎤 Oru Venal Puzhayil</li>
-      <li data-src="/static/audio/song5.mp3">🎤 Kya hua tera wada</li>
-      <li data-src="/static/audio/song6.mp3">🎤 Parayathe ariyathe</li>
+      <li data-src="{{ url_for('static', filename='audio/song1.mp3') }}" class="active">🎤 Munbe Vaa</li>
+      <li data-src="{{ url_for('static', filename='audio/song2.mp3') }}">🎤 Ninakai njan paattu</li>
+      <li data-src="{{ url_for('static', filename='audio/song3.mp3') }}">🎤 Mozhikalum Mounangalum</li>
+      <li data-src="{{ url_for('static', filename='audio/song4.mp3') }}">🎤 Oru Venal Puzhayil</li>
+      <li data-src="{{ url_for('static', filename='audio/song5.mp3') }}">🎤 Kya hua tera wada</li>
+      <li data-src="{{ url_for('static', filename='audio/song6.mp3') }}">🎤 Parayathe ariyathe</li>
     </ul>
   </div>
-
+  
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const playlist = document.getElementById("playlist");
