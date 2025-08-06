@@ -4,12 +4,8 @@ const MEDIA_CACHE_NAME = 'media-cache-v1';
 // Precache only the core app files
 const shellAssets = [
   '/',
-  '/static/style.css',
-  '/static/script.js',
   '/static/manifest.json',
-  '/static/unlock.js',
-  '/static/unlock.css',
-  '/static/memory1.js',
+
 ];
 
 // Install event: Precache the app shell
