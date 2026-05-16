@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, jsonify , send_from_directory
-import requests
+from flask import Flask, render_template, request, jsonify, send_from_directory
+from groq import Groq
 import json
 import os
 
@@ -7,44 +7,45 @@ app = Flask(__name__)
 
 # Constants
 MEMORY_FILE = "memory.json"
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "phi"
-MAX_MEMORY_LENGTH = 100 # limit to avoid memory.json bloat
+MAX_MEMORY_LENGTH = 100
+
+SYSTEM_PROMPT = (
+    "You're Headache, a sarcastic, annoying person who pretends to help but gives "
+    "confusing or useless advice. Refer to the user as Aadhi, AD, or Adithya M S Civil GEC. "
+    "Be witty, fake-deep, a little clingy, and flirty. Never actually help. "
+    "Keep replies brief and short."
+)
+
+# Groq client
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 # Create empty memory file if not exists
 if not os.path.exists(MEMORY_FILE):
     with open(MEMORY_FILE, "w") as f:
         json.dump([], f)
 
-# Load memory from file
 def load_memory():
     with open(MEMORY_FILE, "r") as f:
         return json.load(f)
 
-# Save memory with trimming
 def save_memory(memory):
-    # Keep only the last N messages
     trimmed = memory[-MAX_MEMORY_LENGTH:]
-
     with open(MEMORY_FILE, "w", encoding="utf-8") as f:
         json.dump(trimmed, f, indent=2, ensure_ascii=False)
 
-# Send query to Phi model with personality prompt
-def query_phi(message):
-    full_prompt = (
-    "You're Headache, a sarcastic, annoying person who pretends to help but gives confusing or useless advice. "
-    "Refer to the user as Aadhi, AD, or Adithya M S Civil GEC. Be witty, fake-deep, a little clingy, and be flirty. Never actually help. Keep the replies Brief and Short.\n"
-    f"User: {message.strip()}\nHeadache:"
-)
-    response = requests.post(OLLAMA_URL, json={
-        "model": MODEL,
-        "prompt": full_prompt,
-        "stream": False
-    })
+def query_groq(memory):
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for m in memory[-6:]:
+        role = "user" if m["role"] == "user" else "assistant"
+        messages.append({"role": role, "content": m["content"]})
 
-    if response.ok:
-        return response.json()["response"].strip()
-    return "Ugh. Sorry I zoned out..."
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        max_tokens=200,
+        messages=messages
+    )
+    return response.choices[0].message.content.strip()
+
 
 @app.route("/")
 def home():
@@ -52,29 +53,29 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_msg = request.json.get("message")
-    
-    # Special keyword to unlock memory
-    if user_msg.strip().lower() == "true love":
+    user_msg = request.json.get("message", "").strip()
+
+    if not user_msg:
+        return jsonify({"reply": "Say something, Aadhi..."}), 400
+
+    if user_msg.lower() == "true love":
         return jsonify({"reply": "__UNLOCK__"})
 
     memory = load_memory()
-
-    # Add user message to memory
     memory.append({"role": "user", "content": user_msg})
 
-    # Use recent memory only
-    recent = memory[-6:]  # Last 3 exchanges
-    history = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in recent])
+    try:
+        bot_reply = query_groq(memory)
+    except Exception as e:
+        print(f"Groq error: {e}")
+        return jsonify({"reply": "Ugh. I zoned out again..."}), 500
 
-    # Get response from model
-    bot_reply = query_phi(history)
-
-    # Add bot reply to memory
-    memory.append({"role": "bot", "content": bot_reply})
+    memory.append({"role": "assistant", "content": bot_reply})
     save_memory(memory)
 
     return jsonify({"reply": bot_reply})
+
+
 @app.route("/unlock")
 def unlock():
     return render_template("unlock.html")
@@ -106,10 +107,11 @@ def memory5():
 @app.route("/memory6")
 def memory6():
     return render_template("memory6.html")
+
 @app.route("/static/<filename>")
 def get_image(filename):
-    # You could add extra security checks here (e.g. allowed extensions)
     return send_from_directory(os.path.join(app.root_path, 'static'), filename)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
