@@ -5,7 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Director Sir & Aadhi</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
     body {
       overflow: hidden;
@@ -13,8 +21,6 @@
       font-family: sans-serif;
       width: 100vw;
       height: 100vh;
-      user-select: none;        
-      -webkit-user-select: none;
     }
 
     #comic {
@@ -25,38 +31,36 @@
       cursor: pointer;
     }
 
-    .choice-btn {
+    #choice-bar {
       position: fixed;
       bottom: 5%;
-      font-size: clamp(0.8rem, 2.5vw, 1.1rem);
-      padding: clamp(8px, 2vw, 12px) clamp(10px, 3vw, 20px);
+      left: 0;
+      width: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      z-index: 10;
+    }
+
+    .choice-btn {
+      flex: 1;
+      max-width: 160px;
+      font-size: clamp(0.75rem, 2.5vw, 1rem);
+      padding: 10px 8px;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      z-index: 10;
-      display: none;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    #accept-btn {
-      left: 50%;
-      transform: translateX(-160%);
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    #think-btn {
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #FFA500;
-      color: white;
-    }
-
-    #deny-btn {
-      left: 50%;
-      transform: translateX(60%);
-      background-color: #DC143C;
-      color: white;
-    }
+    #accept-btn { background-color: #4CAF50; color: white; }
+    #think-btn  { background-color: #FFA500; color: white; }
+    #deny-btn   { background-color: #DC143C; color: white; }
 
     #back-link {
       position: fixed;
@@ -72,6 +76,9 @@
       cursor: pointer;
       z-index: 10;
       display: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     #confetti-canvas {
@@ -87,9 +94,12 @@
   <canvas id="confetti-canvas"></canvas>
   <img id="comic" src="{{ url_for('static', filename='comic_pages/comic_cover.png') }}" alt="comic page" />
 
-  <button id="accept-btn" class="choice-btn">I accept it</button>
-  <button id="think-btn"  class="choice-btn">I'll think about it…</button>
-  <button id="deny-btn"   class="choice-btn">I deny it</button>
+  <div id="choice-bar">
+    <button id="accept-btn" class="choice-btn">I accept it</button>
+    <button id="think-btn"  class="choice-btn">I'll think about it…</button>
+    <button id="deny-btn"   class="choice-btn">I deny it</button>
+  </div>
+
   <button id="back-link">⬅ Back to Home</button>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -106,6 +116,7 @@
 
     let index = 0;
     const imgEl     = document.getElementById('comic');
+    const choiceBar = document.getElementById('choice-bar');
     const acceptBtn = document.getElementById('accept-btn');
     const thinkBtn  = document.getElementById('think-btn');
     const denyBtn   = document.getElementById('deny-btn');
@@ -113,9 +124,7 @@
     const baseUrl   = "{{ url_for('static', filename='comic_pages/') }}";
 
     function showButtons(show) {
-      [acceptBtn, thinkBtn, denyBtn].forEach(btn => {
-        btn.style.display = show ? 'block' : 'none';
-      });
+      choiceBar.style.display = show ? 'flex' : 'none';
     }
 
     function updateImage() {
@@ -123,15 +132,18 @@
       showButtons(index === 5);
     }
 
-    // Tap left = previous, tap right = next
-    document.body.addEventListener('click', (e) => {
-      // Ignore clicks on any button
-      if (e.target.closest('button')) return;
+    // Use touchend for mobile, click for desktop — prevents blue flash on tap
+    function addTapHandler(el, fn) {
+      el.addEventListener('touchend', (e) => { e.preventDefault(); fn(e); }, { passive: false });
+      el.addEventListener('click', fn);
+    }
 
-      // Lock navigation on choice page
+    // Page navigation via tap left / tap right
+    addTapHandler(document.body, (e) => {
+      if (e.target.closest('button') || e.target.closest('#choice-bar')) return;
       if (index === 5) return;
 
-      const clickX = e.clientX;
+      const clickX = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
       const width  = window.innerWidth;
 
       if (clickX > width / 2 && index < images.length - 1) {
@@ -143,26 +155,26 @@
       updateImage();
     });
 
-    acceptBtn.onclick = () => {
+    addTapHandler(acceptBtn, () => {
       imgEl.src = baseUrl + 'comic_6.png';
       showButtons(false);
       backLink.style.display = 'block';
       runConfetti();
       alert("You can't turn back from this moment. This is forever.");
-    };
+    });
 
-    thinkBtn.onclick = () => {
+    addTapHandler(thinkBtn, () => {
       index = 6;
       updateImage();
-    };
+    });
 
-    denyBtn.onclick = () => {
+    addTapHandler(denyBtn, () => {
       alert("This option is not available.");
-    };
+    });
 
-    backLink.onclick = () => {
+    addTapHandler(backLink, () => {
       window.location.href = '/memory';
-    };
+    });
 
     function runConfetti() {
       const end = Date.now() + 10000;
