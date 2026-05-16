@@ -5,7 +5,6 @@ import os
 
 app = Flask(__name__)
 
-# Constants
 MEMORY_FILE = "memory.json"
 MAX_MEMORY_LENGTH = 100
 
@@ -16,10 +15,8 @@ SYSTEM_PROMPT = (
     "Keep replies brief and short."
 )
 
-# Groq client
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-# Create empty memory file if not exists
 if not os.path.exists(MEMORY_FILE):
     with open(MEMORY_FILE, "w") as f:
         json.dump([], f)
@@ -38,14 +35,12 @@ def query_groq(memory):
     for m in memory[-6:]:
         role = "user" if m["role"] == "user" else "assistant"
         messages.append({"role": role, "content": m["content"]})
-
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         max_tokens=200,
         messages=messages
     )
     return response.choices[0].message.content.strip()
-
 
 @app.route("/")
 def home():
@@ -54,27 +49,20 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     user_msg = request.json.get("message", "").strip()
-
     if not user_msg:
         return jsonify({"reply": "Say something, Aadhi..."}), 400
-
     if user_msg.lower() == "true love":
         return jsonify({"reply": "__UNLOCK__"})
-
     memory = load_memory()
     memory.append({"role": "user", "content": user_msg})
-
     try:
         bot_reply = query_groq(memory)
     except Exception as e:
         print(f"Groq error: {e}")
         return jsonify({"reply": "Ugh. I zoned out again..."}), 500
-
     memory.append({"role": "assistant", "content": bot_reply})
     save_memory(memory)
-
     return jsonify({"reply": bot_reply})
-
 
 @app.route("/unlock")
 def unlock():
@@ -111,7 +99,6 @@ def memory6():
 @app.route("/static/<filename>")
 def get_image(filename):
     return send_from_directory(os.path.join(app.root_path, 'static'), filename)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
