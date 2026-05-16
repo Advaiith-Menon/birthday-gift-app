@@ -2,260 +2,535 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Memory Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #f89fee;
+      --pink-dim: #c76dbf;
+      --gold: #ffe5a0;
+      --star-white: #e8f0ff;
+      --deep: #040610;
     }
 
-.back-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #999;
-  font-size: 1rem;
-  text-decoration: underline;
-  transition: color 0.3s ease;
-  z-index: 10000; /* Make sure it's above all other content! */
-}
-
-.back-btn:hover {
-  color: #fff;
-}
-
-
-    .container {
-        position: relative;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-
-
-    .main-star {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        z-index: 3;
-        align-items: center;
-        justify-content: center;
-        animation: twinklePulse 2s infinite ease-in-out;
-        transform: translate(-50%, -50%);
-    }
-
-    .main-star svg {
+    html, body {
       width: 100%;
       height: 100%;
-      fill: #fa9bef;
-      filter: drop-shadow(0 0 10px #f89fee);
+      overflow: hidden;
+      background: var(--deep);
+      color: white;
+      font-family: 'Crimson Text', Georgia, serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .main-star-text {
+    /* ── Loader ── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--deep);
+      z-index: 9999;
+      transition: opacity 0.8s ease;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    #loader-text {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 8vw, 4rem);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(255, 220, 120, 0.6), 0 0 80px rgba(255, 180, 80, 0.3);
+      animation: loaderPulse 1.4s ease-in-out infinite;
+    }
+    #loader-sub {
+      font-size: clamp(0.85rem, 3vw, 1.1rem);
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-style: italic;
+    }
+    @keyframes loaderPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* ── Background nebula ── */
+    .nebula {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .nebula::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(100, 30, 120, 0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(20, 50, 130, 0.22) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 55% 85%, rgba(180, 50, 100, 0.14) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 50%, #0d1128 0%, #040610 100%);
+    }
+
+    /* ── Static background stars ── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Main scene ── */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Main star ── */
+    .main-star {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: #000;
-      font-size: 18px;
-      font-weight: bold;
-      z-index: 4;
+      z-index: 5;
+      cursor: default;
+      animation: mainPulse 3s ease-in-out infinite;
+    }
+    .main-star svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: var(--pink);
+      filter: drop-shadow(0 0 18px rgba(248, 159, 238, 0.9)) drop-shadow(0 0 50px rgba(248, 159, 238, 0.4));
+    }
+    .main-star-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.65rem, 2.5vw, 1rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #1a0920;
+      z-index: 6;
+      pointer-events: none;
+      text-shadow: none;
+    }
+    @keyframes mainPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+      50% { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.15); }
+    }
+
+    /* ── Orbit ring ── */
+    .orbit-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.07);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 2;
+      animation: ringRotate 60s linear infinite;
+    }
+    @keyframes ringRotate {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ── Mini stars ── */
+    .mini-stars { position: absolute; inset: 0; z-index: 4; }
+
+    .mini-star {
+      position: absolute;
+      cursor: pointer;
+      transform-origin: center;
+      transition: transform 0.25s ease, filter 0.25s ease;
     }
     .mini-star svg {
-        width: 100%;
-        height: 100%;
-        fill: #ffffff;
-        filter: drop-shadow(0 0 4px #ffffff);
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: var(--star-white);
+      filter: drop-shadow(0 0 5px rgba(232, 240, 255, 0.8));
+      transition: fill 0.3s ease, filter 0.3s ease;
     }
-    .mini-stars {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: 2;
-    }
-    .mini-star {
-        position: absolute;
-        cursor: pointer;
-        transition: transform 0.3s;
-        transform-origin: center;
-    }
-
     .mini-star:hover {
-        transform: scale(1.3);
+      transform: scale(1.35) !important;
+    }
+    .mini-star:hover svg {
+      fill: var(--gold);
+      filter: drop-shadow(0 0 10px rgba(255, 229, 160, 1)) drop-shadow(0 0 25px rgba(255, 200, 80, 0.6));
+    }
+    .mini-star:active {
+      transform: scale(0.9) !important;
     }
 
-    .stars {
+    /* Memory label under each mini star */
+    .mini-star-label {
       position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.55);
+      pointer-events: none;
+      transition: opacity 0.25s ease, color 0.25s ease;
+    }
+    .mini-star:hover .mini-star-label {
+      color: var(--gold);
+      opacity: 1;
+    }
+
+    /* Individual twinkling animations */
+    .mini-star:nth-child(1) { animation: miniFloat1 4s ease-in-out infinite; }
+    .mini-star:nth-child(2) { animation: miniFloat2 5s ease-in-out infinite; }
+    .mini-star:nth-child(3) { animation: miniFloat3 3.5s ease-in-out infinite; }
+    .mini-star:nth-child(4) { animation: miniFloat4 4.5s ease-in-out infinite; }
+    .mini-star:nth-child(5) { animation: miniFloat5 5.5s ease-in-out infinite; }
+    .mini-star:nth-child(6) { animation: miniFloat6 4s ease-in-out infinite 1s; }
+
+    @keyframes miniFloat1 { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.07)} }
+    @keyframes miniFloat2 { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.09)} }
+    @keyframes miniFloat3 { 0%,100%{opacity:.8;transform:scale(1)} 50%{opacity:.95;transform:scale(1.05)} }
+    @keyframes miniFloat4 { 0%,100%{opacity:.65;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
+    @keyframes miniFloat5 { 0%,100%{opacity:.75;transform:scale(1)} 50%{opacity:.9;transform:scale(1.06)} }
+    @keyframes miniFloat6 { 0%,100%{opacity:.55;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+
+    /* ── Connector lines ── */
+    #connectors {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    #connectors line {
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 1;
+      stroke-dasharray: 3 8;
+    }
+
+    /* ── Back button ── */
+    .back-btn {
+      position: fixed;
+      bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+      letter-spacing: 0.2em;
+      text-decoration: none;
+      color: rgba(255,255,255,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 20px;
+      border-radius: 40px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      background: rgba(255,255,255,0.03);
+      transition: color 0.3s, border-color 0.3s, background 0.3s;
+      z-index: 10000;
+      white-space: nowrap;
+    }
+    .back-btn:hover {
+      color: rgba(255,255,255,0.8);
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.07);
+    }
+
+    /* ── Shooting star ── */
+    .shooting-star {
+      position: fixed;
       width: 2px;
       height: 2px;
       background: white;
       border-radius: 50%;
-      opacity: 0.8;
-      animation: twinkle 2s infinite ease-in-out;
-    }
-
-    #loader {
-      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      color: #ffffff;
-      font-size: 15vw; /* Scales with screen size */
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center; /* <--- This centers vertically */
-      text-align: center;
-      z-index: 9999;
-      opacity: 1;
-      transition: opacity 0.5s ease;
       pointer-events: none;
+      z-index: 1;
+    }
+    .shooting-star::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 1px;
+      background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+      transform-origin: right center;
     }
 
-#loader.hidden {
-  opacity: 0;
-}
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.2; }
-      50% { opacity: 1; }
+    /* ── Ripple on click ── */
+    .ripple {
+      position: fixed;
+      border-radius: 50%;
+      border: 1.5px solid rgba(248,159,238,0.5);
+      pointer-events: none;
+      z-index: 10;
+      animation: rippleOut 0.7s ease-out forwards;
+    }
+    @keyframes rippleOut {
+      from { transform: scale(0); opacity: 1; }
+      to   { transform: scale(4); opacity: 0; }
     }
 
-
-    @keyframes twinklePulse {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); }
-        50% { transform: translate(-50%, -50%) scale(1.2); }
+    /* ── Touch hint ── */
+    .touch-hint {
+      position: fixed;
+      bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 70px));
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.55rem, 2vw, 0.7rem);
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.2);
+      white-space: nowrap;
+      animation: hintFade 4s ease-in-out 2s forwards;
+      pointer-events: none;
+      z-index: 9999;
     }
-
+    @keyframes hintFade {
+      0%   { opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="loader">Surprise!!!!</div>
-        <div class="main-star">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/>
-            </svg>
-            <div class="main-star-text">Aadhi</div>
-        </div>
 
-        <!-- Mini memory stars -->
-        <div class="mini-stars">
-            <div class="mini-star">
-                <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-            </div>
-            <div class="mini-star">
-                <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-            </div>
-            <div class="mini-star">
-                <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-            </div>
-            <div class="mini-star">
-                <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-            </div>
-            <div class="mini-star">
-                <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-            </div>
-            <div class="mini-star " >
-                <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-            </div>
-        </div>
+  <!-- Loader -->
+  <div id="loader">
+    <div id="loader-text">Surprise!</div>
+    <div id="loader-sub">a sky just for you</div>
   </div>
 
-  <script>
-    window.addEventListener("load", () => {
-      requestAnimationFrame(() => {
-      // your star placement logic
-      placeStars();
+  <!-- Background -->
+  <div class="nebula"></div>
+  <canvas id="starfield"></canvas>
 
-      // hide the loader after a short delay (e.g. 300ms)
-        setTimeout(() => {
-          document.getElementById("loader").classList.add("hidden");
-        }, 300);
+  <!-- Connector lines SVG -->
+  <svg id="connectors"></svg>
+
+  <!-- Main scene -->
+  <div class="scene">
+    <!-- Orbit ring placeholder; sized by JS -->
+    <div class="orbit-ring" id="orbitRing"></div>
+
+    <!-- Main star -->
+    <div class="main-star" id="mainStar">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/>
+      </svg>
+      <div class="main-star-label">Aadhi</div>
+    </div>
+
+    <!-- Mini memory stars -->
+    <div class="mini-stars" id="miniStars">
+      <div class="mini-star" data-label="Memory 1">
+        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+        <span class="mini-star-label">Memory 1</span>
+      </div>
+      <div class="mini-star" data-label="Memory 2">
+        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+        <span class="mini-star-label">Memory 2</span>
+      </div>
+      <div class="mini-star" data-label="Memory 3">
+        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+        <span class="mini-star-label">Memory 3</span>
+      </div>
+      <div class="mini-star" data-label="Memory 4">
+        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+        <span class="mini-star-label">Memory 4</span>
+      </div>
+      <div class="mini-star" data-label="Memory 5">
+        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+        <span class="mini-star-label">Memory 5</span>
+      </div>
+      <div class="mini-star" data-label="Memory 6">
+        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+        <span class="mini-star-label">Memory 6</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Touch hint -->
+  <div class="touch-hint">✦ tap a star ✦</div>
+
+  <!-- Back button -->
+  <a href="/" class="back-btn">← Return</a>
+
+  <script>
+    /* ── Starfield canvas ── */
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function buildStars() {
+      stars = [];
+      const count = Math.min(600, Math.floor(window.innerWidth * window.innerHeight / 2200));
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.2 + 0.2,
+          alpha: Math.random() * 0.7 + 0.15,
+          speed: Math.random() * 0.8 + 0.2,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function drawStars(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const s of stars) {
+        const a = s.alpha * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220,230,255,${a})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(drawStars);
+    }
+
+    resizeCanvas();
+    buildStars();
+    requestAnimationFrame(drawStars);
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      buildStars();
+      placeStars();
+    });
+
+    /* ── Shooting stars ── */
+    function shootingStar() {
+      const el = document.createElement('div');
+      el.className = 'shooting-star';
+      const startX = Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.2;
+      const startY = Math.random() * window.innerHeight * 0.3;
+      const angle = 20 + Math.random() * 30;
+      const dist = 200 + Math.random() * 200;
+      el.style.left = startX + 'px';
+      el.style.top = startY + 'px';
+      document.body.appendChild(el);
+
+      el.animate([
+        { transform: 'translate(0,0) rotate('+angle+'deg)', opacity: 1 },
+        { transform: `translate(${dist * Math.cos(angle * Math.PI/180)}px, ${dist * Math.sin(angle * Math.PI/180)}px) rotate(${angle}deg)`, opacity: 0 }
+      ], { duration: 700 + Math.random() * 400, easing: 'ease-out' }).onfinish = () => el.remove();
+    }
+
+    setInterval(() => { if (Math.random() < 0.6) shootingStar(); }, 3500);
+
+    /* ── Layout ── */
+    function placeStars() {
+      const mainStar = document.getElementById('mainStar');
+      const miniStars = document.querySelectorAll('.mini-star');
+      const orbitRing = document.getElementById('orbitRing');
+      const connSvg = document.getElementById('connectors');
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const minDim = Math.min(vw, vh);
+
+      const mainSize = minDim * 0.25;
+      const miniSize = minDim * 0.13;
+      const radius   = minDim * 0.38;
+      const labelOffset = miniSize * 0.6;
+
+      // Main star
+      mainStar.style.width  = mainSize + 'px';
+      mainStar.style.height = mainSize + 'px';
+      mainStar.querySelector('.main-star-label').style.fontSize = (mainSize * 0.18) + 'px';
+
+      // Orbit ring
+      const ringDiam = radius * 2 + miniSize;
+      orbitRing.style.width  = ringDiam + 'px';
+      orbitRing.style.height = ringDiam + 'px';
+
+      // Center of screen (= center of main star)
+      const cx = vw / 2;
+      const cy = vh / 2;
+
+      // Clear connectors
+      connSvg.innerHTML = '';
+      connSvg.setAttribute('width', vw);
+      connSvg.setAttribute('height', vh);
+
+      miniStars.forEach((star, i) => {
+        star.style.width  = miniSize + 'px';
+        star.style.height = miniSize + 'px';
+
+        const angle = (i / miniStars.length) * 2 * Math.PI - Math.PI / 2;
+        const sx = cx + radius * Math.cos(angle) - miniSize / 2;
+        const sy = cy + radius * Math.sin(angle) - miniSize / 2;
+        star.style.left = sx + 'px';
+        star.style.top  = sy + 'px';
+
+        // Label position (below star, outward from center)
+        const lbl = star.querySelector('.mini-star-label');
+        if (lbl) {
+          lbl.style.top = (miniSize + 6) + 'px';
+          lbl.style.fontSize = Math.max(9, minDim * 0.022) + 'px';
+        }
+
+        // Connector line
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', cx);
+        line.setAttribute('y1', cy);
+        line.setAttribute('x2', sx + miniSize / 2);
+        line.setAttribute('y2', sy + miniSize / 2);
+        connSvg.appendChild(line);
+      });
+    }
+
+    /* ── Ripple effect ── */
+    function spawnRipple(x, y) {
+      const el = document.createElement('div');
+      el.className = 'ripple';
+      const size = 40;
+      el.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 700);
+    }
+
+    /* ── Navigation ── */
+    document.querySelectorAll('.mini-star').forEach((star, i) => {
+      star.addEventListener('click', e => {
+        const rect = star.getBoundingClientRect();
+        spawnRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        setTimeout(() => { window.location.href = `/memory${i + 1}`; }, 350);
       });
     });
 
-  // Generate static background stars
-  for (let i = 0; i < 500; i++) {
-        const stars = document.createElement('div');
-        stars.className = 'stars';
-        stars.style.top = `${Math.random() * 100}vh`;
-        stars.style.left = `${Math.random() * 100}vw`;
-        stars.style.animationDelay = `${Math.random() * 3}s`;
-        document.body.appendChild(stars);
-    }
-  
-
-
-  
-  // Function to add Event Listeners to mini stars
-
-    const placeStars = () => {
-        const mainStar = document.querySelector(".main-star");
-        const miniStars = document.querySelectorAll(".mini-star");
-        const container = document.querySelector(".container");
-
-        const containerRect = container.getBoundingClientRect();
-        const minDimension = Math.min(containerRect.width, containerRect.height);
-        
-    // Responsive sizes and radius
-        const radius = minDimension * 0.40; // 40% of screen size
-        const mainStarSize = minDimension * 0.3; // 30% of screen size
-        const miniStarSize = minDimension * 0.15; // 15% of screen size
-
-
-    // Set main star size
-        mainStar.style.width = `${mainStarSize}px`;
-        mainStar.style.height = `${mainStarSize}px`;
-
-    // Get main star center
-        const mainRect = mainStar.getBoundingClientRect();
-        const centerX = mainRect.left - containerRect.left + mainRect.width / 2;
-        const centerY = mainRect.top - containerRect.top + mainRect.height / 2;
-
-    // Position mini-stars
-        miniStars.forEach((star, index) => {
-    // Set size
-        star.style.width = `${miniStarSize}px`;
-        star.style.height = `${miniStarSize}px`;
-
-        const angle = (index / miniStars.length) * 2 * Math.PI;
-
-        const x = centerX + radius * Math.cos(angle) - miniStarSize / 2;
-        const y = centerY + radius * Math.sin(angle) - miniStarSize / 2;
-
-        star.style.left = `${x}px`;
-        star.style.top = `${y}px`;
-    });
-};
-
-    placeStars(); 
-
-    window.addEventListener("resize", placeStars);
-    window.addEventListener("orientationchange", placeStars);
-
-    document.querySelectorAll('.mini-star').forEach((star, index) => {
-        star.addEventListener('click', () => {
-        window.location.href = `/memory${index + 1}`; // Navigate to memory page
-        });
+    /* ── Init ── */
+    window.addEventListener('load', () => {
+      placeStars();
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+      }, 1000);
     });
 
-
-</script>
-  <a href="/" class="back-btn">⬅ Headache-AI</a>
+    window.addEventListener('orientationchange', () => {
+      setTimeout(placeStars, 150);
+    });
+  </script>
 </body>
 </html>
