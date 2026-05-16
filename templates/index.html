@@ -2,343 +2,306 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
   <title>Headache-AI</title>
 
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="theme-color" content="#080b12" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
 
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg:        #0a0a0f;
-      --surface:   #111118;
-      --surface2:  #18181f;
-      --surface3:  #1e1e27;
-      --border:    rgba(255,255,255,0.06);
-      --border2:   rgba(255,255,255,0.1);
-      --accent:    #c8ff57;       /* electric lime — the signature color */
-      --accent-dim: rgba(200,255,87,0.12);
-      --accent-glow: rgba(200,255,87,0.2);
-      --text:      #f0ede8;
-      --text2:     #7a7880;
-      --user-bg:   #1f1f2a;
-      --user-border: rgba(200,255,87,0.25);
+      --bg:       #080b12;
+      --surface:  #0e1320;
+      --surface2: #141927;
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.12);
+      --accent:   #7b61ff;
+      --accent2:  #a78bfa;
+      --teal:     #2dd4bf;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --glow:     rgba(123,97,255,0.18);
     }
 
-    html, body {
+    /*
+      THE KEY INSIGHT:
+      - html+body fill the viewport as a flex column
+      - header is sticky (stays at top, part of normal flow)
+      - #main takes up remaining space with flex:1
+      - When keyboard opens on mobile, the viewport shrinks,
+        the whole column shrinks, and the input naturally rises.
+        No JS needed for keyboard handling.
+    */
+
+    html {
       height: 100%;
-      height: 100dvh;
-      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body {
+      height: 100%;
       background: var(--bg);
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 15px;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* subtle grain overlay */
     body::before {
       content: '';
       position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(123,97,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,97,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
       pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-      opacity: 0.5;
     }
 
-    /* ═══════════════════════════════════════
-       FIXED HEADER — never moves
-    ═══════════════════════════════════════ */
+    /* ── HEADER: sticky, never scrolls away ── */
     #app-header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      position: sticky;
+      top: 0;
+      z-index: 50;
       background: var(--bg);
       border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
     }
 
     .header-inner {
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto;
-      padding: 14px 20px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
       gap: 14px;
     }
 
-    /* avatar */
-    .avatar-wrap {
-      position: relative;
-      width: 46px; height: 46px;
-      flex-shrink: 0;
-    }
-    .avatar-img-wrap {
-      width: 46px; height: 46px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1.5px solid var(--border2);
+    .avatar-wrap { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+
+    #avatar-container {
+      width: 56px; height: 56px;
+      border-radius: 50%; overflow: hidden;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 16px var(--glow);
       position: relative;
       background: var(--surface2);
     }
-    .avatar-img-wrap img {
+    #avatar-container img {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
       object-fit: cover;
     }
-    .avatar-pulse {
-      position: absolute;
-      inset: -4px;
-      border-radius: 18px;
+
+    .avatar-ring {
+      position: absolute; inset: -5px;
+      border-radius: 50%;
       border: 1.5px solid var(--accent);
-      opacity: 0;
-      transition: opacity 0.3s;
+      opacity: 0; transition: opacity 0.3s;
     }
-    .avatar-pulse.active {
+    .avatar-ring.active {
       opacity: 1;
-      animation: pulsing 1.4s ease-in-out infinite;
+      animation: ringPulse 1.2s ease-in-out infinite;
     }
-    @keyframes pulsing {
-      0%, 100% { transform: scale(1); opacity: 0.9; }
-      50%       { transform: scale(1.12); opacity: 0.1; }
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1);    opacity: 0.9; }
+      50%       { transform: scale(1.18); opacity: 0.15; }
     }
 
-    .header-meta { flex: 1; min-width: 0; }
+    .header-info { flex: 1; min-width: 0; }
     .header-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem; font-weight: 700;
+      color: var(--text); letter-spacing: 0.03em;
     }
     .header-status {
       display: flex; align-items: center; gap: 6px;
-      font-size: 0.72rem;
-      color: var(--text2);
-      margin-top: 2px;
-      letter-spacing: 0.03em;
+      font-size: 0.7rem; color: var(--muted);
+      margin-top: 3px; letter-spacing: 0.04em;
     }
-    .status-pip {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 6px var(--accent-glow);
-      flex-shrink: 0;
-      animation: pip 2.8s ease-in-out infinite;
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 6px var(--teal);
+      animation: dotBlink 2.5s ease-in-out infinite;
     }
-    @keyframes pip {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.25; }
-    }
+    @keyframes dotBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* ═══════════════════════════════════════
-       MAIN LAYOUT — sits below fixed header
-    ═══════════════════════════════════════ */
-    #layout {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      /* top is set by JS after measuring header */
+    /* ── MAIN: flex column, fills all space below header ── */
+    #main {
+      flex: 1;
+      min-height: 0;          /* lets it shrink when keyboard opens */
       display: flex;
       flex-direction: column;
-      max-width: 760px;
+      max-width: 780px;
+      width: 100%;
       margin: 0 auto;
+      padding: 0 16px;
     }
 
-    /* ═══════════════════════════════════════
-       CHAT LOG — scrollable middle
-    ═══════════════════════════════════════ */
+    /* ── CHAT LOG: scrollable, fills remaining space ── */
     #chat-log {
       flex: 1;
+      min-height: 0;          /* critical — without this it won't scroll */
       overflow-y: auto;
-      overflow-x: hidden;
-      padding: 28px 20px 12px;
+      padding: 24px 0 8px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      scroll-behavior: smooth;
+      gap: 14px;
       scrollbar-width: thin;
       scrollbar-color: var(--border2) transparent;
     }
-    #chat-log::-webkit-scrollbar { width: 3px; }
+    #chat-log::-webkit-scrollbar { width: 4px; }
     #chat-log::-webkit-scrollbar-track { background: transparent; }
-    #chat-log::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    #chat-log::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-    /* ── Messages ── */
-    .msg {
-      display: flex;
-      animation: fadeUp 0.2s ease-out both;
-    }
-    @keyframes fadeUp {
+    /* messages */
+    .msg { display: flex; max-width: 85%; animation: msgIn 0.22s ease-out both; }
+    @keyframes msgIn {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .msg.user { justify-content: flex-end; }
-    .msg.bot  { justify-content: flex-start; }
+    .msg.user { align-self: flex-end; }
+    .msg.bot  { align-self: flex-start; }
 
     .bubble {
-      max-width: 78%;
       padding: 10px 15px;
-      line-height: 1.68;
+      border-radius: 18px;
+      line-height: 1.65;
       font-size: 0.9rem;
       word-break: break-word;
-      white-space: pre-wrap;
     }
-
     .user .bubble {
-      background: var(--user-bg);
-      border: 1px solid var(--user-border);
-      border-radius: 18px 18px 4px 18px;
-      color: var(--text);
+      background: linear-gradient(135deg, #5d3aff, #8b68ff);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+      box-shadow: 0 2px 18px rgba(93,58,255,0.28);
     }
-
     .bot .bubble {
       background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 18px 18px 18px 4px;
       color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 5px;
     }
-
     .bubble.error {
-      background: rgba(255, 80, 80, 0.08);
-      border-color: rgba(255, 80, 80, 0.25);
-      color: #ff9090;
+      background: rgba(239,68,68,0.1);
+      border-color: rgba(239,68,68,0.3);
+      color: #fca5a5;
     }
 
-    /* typing dots */
+    /* typing */
     .typing-bubble {
       display: flex; align-items: center; gap: 5px;
-      padding: 14px 18px;
+      padding: 12px 16px;
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 18px 18px 18px 4px;
+      border-radius: 18px;
+      border-bottom-left-radius: 5px;
     }
     .dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: bounce 1s ease-in-out infinite;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal);
+      animation: typeBounce 1.1s ease-in-out infinite;
     }
-    .dot:nth-child(2) { animation-delay: 0.14s; }
-    .dot:nth-child(3) { animation-delay: 0.28s; }
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0);   opacity: 0.3; }
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes typeBounce {
+      0%, 60%, 100% { transform: translateY(0);   opacity: 0.35; }
       30%            { transform: translateY(-5px); opacity: 1; }
     }
 
     /* intro */
     .intro {
-      align-self: center;
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--text2);
-      font-size: 0.85rem;
-      line-height: 2;
+      align-self: center; text-align: center;
+      padding: 48px 20px;
+      color: var(--muted); font-size: 0.85rem; line-height: 1.9;
     }
     .intro-title {
       display: block;
-      font-family: 'Syne', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 1.2rem; color: var(--accent2);
       margin-bottom: 6px;
-      letter-spacing: -0.01em;
     }
 
-    /* ── divider ── */
-    .divider {
-      flex-shrink: 0;
-      height: 1px;
-      background: var(--border);
-      margin: 0 20px;
-    }
+    .divider { flex-shrink: 0; height: 1px; background: var(--border); }
 
-    /* ═══════════════════════════════════════
-       INPUT AREA
-    ═══════════════════════════════════════ */
+    /* ── INPUT: always visible at bottom ── */
     .input-wrap {
       flex-shrink: 0;
-      padding: 12px 20px;
+      padding: 12px 0;
       padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
     }
 
     .input-box {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
+      display: flex; align-items: flex-end; gap: 10px;
       background: var(--surface2);
       border: 1px solid var(--border2);
       border-radius: 16px;
       padding: 10px 10px 10px 16px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.25s, box-shadow 0.25s;
     }
     .input-box:focus-within {
-      border-color: rgba(200,255,87,0.3);
-      box-shadow: 0 0 0 3px rgba(200,255,87,0.06);
+      border-color: rgba(123,97,255,0.5);
+      box-shadow: 0 0 0 3px rgba(123,97,255,0.1);
     }
 
     #user-input {
-      flex: 1;
-      background: transparent;
+      flex: 1; background: transparent;
       border: none; outline: none;
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      line-height: 1.55;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; line-height: 1.55;
       resize: none;
-      height: 24px;
-      max-height: 120px;
-      overflow-y: hidden;
+      height: 24px; max-height: 120px; overflow-y: hidden;
     }
-    #user-input::placeholder { color: var(--text2); }
+    #user-input::placeholder { color: var(--muted); }
 
     #send-btn {
-      width: 36px; height: 36px;
+      width: 38px; height: 38px;
       border-radius: 10px; border: none;
-      background: var(--accent);
-      color: #0a0a0f;
-      cursor: pointer;
+      background: linear-gradient(135deg, #5d3aff, #8b68ff);
+      color: #fff; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
-      box-shadow: 0 2px 12px rgba(200,255,87,0.25);
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 2px 14px rgba(93,58,255,0.4);
     }
-    #send-btn:hover  { transform: scale(1.07); box-shadow: 0 4px 20px rgba(200,255,87,0.4); }
-    #send-btn:active { transform: scale(0.93); }
-    #send-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+    #send-btn:hover  { transform: scale(1.07); box-shadow: 0 4px 22px rgba(93,58,255,0.55); }
+    #send-btn:active { transform: scale(0.94); }
+    #send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
   </style>
 </head>
 <body>
 
-  <!-- ═══ FIXED HEADER ═══ -->
+  <!-- STICKY HEADER — sticks to top of viewport, shrinks with it when keyboard opens -->
   <header id="app-header">
     <div class="header-inner">
       <div class="avatar-wrap">
-        <div class="avatar-img-wrap">
+        <div id="avatar-container">
           <img id="av-idle" src="{{ url_for('get_image', filename='avatar_idle.jpg') }}" alt="Avatar">
           <img id="av-a"    src="{{ url_for('get_image', filename='avatar1.jpg') }}"     alt="" style="display:none;">
           <img id="av-b"    src="{{ url_for('get_image', filename='avatar2.jpg') }}"     alt="" style="display:none;">
         </div>
-        <div class="avatar-pulse" id="avPulse"></div>
+        <div class="avatar-ring" id="avRing"></div>
       </div>
-
-      <div class="header-meta">
+      <div class="header-info">
         <div class="header-name">Headache-AI</div>
         <div class="header-status">
-          <span class="status-pip"></span>
+          <span class="status-dot"></span>
           <span id="status-text">online · ready</span>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- ═══ SCROLLABLE LAYOUT (anchored below header) ═══ -->
-  <div id="layout">
+  <!-- MAIN — flex:1, shrinks when keyboard opens, input stays visible -->
+  <div id="main">
     <div id="chat-log">
       <div class="intro">
         <span class="intro-title">Hello there ✦</span>
@@ -363,72 +326,47 @@
 
 <script>
 (function () {
-
-  /* ── elements ── */
   const chatLog    = document.getElementById('chat-log');
-  const userInput  = document.getElementById('user-input');
+  const input      = document.getElementById('user-input');
   const sendBtn    = document.getElementById('send-btn');
   const statusText = document.getElementById('status-text');
-  const avPulse    = document.getElementById('avPulse');
+  const avRing     = document.getElementById('avRing');
   const avIdle     = document.getElementById('av-idle');
   const avA        = document.getElementById('av-a');
   const avB        = document.getElementById('av-b');
-  const layout     = document.getElementById('layout');
-  const header     = document.getElementById('app-header');
 
-  /* ── anchor layout below fixed header ── */
-  function anchorLayout() {
-    const h = header.getBoundingClientRect().height;
-    layout.style.top = h + 'px';
-  }
-  anchorLayout();
-  window.addEventListener('resize', anchorLayout);
-
-  /* ── auto-scroll: fires on ANY change inside chat-log ── */
+  /* auto-scroll whenever anything changes in the chat */
   new MutationObserver(() => {
     chatLog.scrollTop = chatLog.scrollHeight;
-  }).observe(chatLog, { childList: true, subtree: true, characterData: true });
+  }).observe(chatLog, { childList: true, subtree: true });
 
-  /* ── mobile keyboard: re-anchor when viewport shrinks ── */
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
-      const h = header.getBoundingClientRect().height;
-      layout.style.top    = h + 'px';
-      layout.style.height = (window.visualViewport.height - h) + 'px';
-    });
-  }
-
-  /* ── textarea auto-grow ── */
-  userInput.addEventListener('input', () => {
-    userInput.style.height = '24px';
-    const next = Math.min(userInput.scrollHeight, 120);
-    userInput.style.height = next + 'px';
-    userInput.style.overflowY = userInput.scrollHeight > 120 ? 'auto' : 'hidden';
+  /* textarea auto-grow */
+  input.addEventListener('input', () => {
+    input.style.height = '24px';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    input.style.overflowY = input.scrollHeight > 120 ? 'auto' : 'hidden';
   });
 
-  /* ── avatar animation ── */
+  /* avatar */
   let avTimer = null;
   function startAvatar() {
     avIdle.style.display = 'none';
-    avA.style.display = 'block';
-    avB.style.display = 'none';
-    avPulse.classList.add('active');
+    avA.style.display = 'block'; avB.style.display = 'none';
+    avRing.classList.add('active');
     avTimer = setInterval(() => {
-      const aShowing = avA.style.display === 'block';
-      avA.style.display = aShowing ? 'none' : 'block';
-      avB.style.display = aShowing ? 'block' : 'none';
+      const a = avA.style.display === 'block';
+      avA.style.display = a ? 'none' : 'block';
+      avB.style.display = a ? 'block' : 'none';
     }, 400);
   }
   function stopAvatar() {
-    clearInterval(avTimer);
-    avTimer = null;
-    avA.style.display = 'none';
-    avB.style.display = 'none';
+    clearInterval(avTimer); avTimer = null;
+    avA.style.display = 'none'; avB.style.display = 'none';
     avIdle.style.display = 'block';
-    avPulse.classList.remove('active');
+    avRing.classList.remove('active');
   }
 
-  /* ── typing indicator ── */
+  /* typing indicator */
   let typingEl = null;
   function showTyping() {
     typingEl = document.createElement('div');
@@ -436,84 +374,68 @@
     typingEl.innerHTML = '<div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
     chatLog.appendChild(typingEl);
   }
-  function hideTyping() {
-    if (typingEl) { typingEl.remove(); typingEl = null; }
-  }
+  function hideTyping() { if (typingEl) { typingEl.remove(); typingEl = null; } }
 
-  /* ── append message ── */
-  function addMessage(text, role, extraClass) {
+  /* add message */
+  function addMsg(text, role, extra) {
     const intro = chatLog.querySelector('.intro');
     if (intro) intro.remove();
-
-    const row    = document.createElement('div');
+    const row = document.createElement('div');
     row.className = 'msg ' + role;
-    const bub    = document.createElement('div');
-    bub.className = 'bubble' + (extraClass ? ' ' + extraClass : '');
+    const bub = document.createElement('div');
+    bub.className = 'bubble' + (extra ? ' ' + extra : '');
     bub.textContent = text;
     row.appendChild(bub);
     chatLog.appendChild(row);
   }
 
-  /* ── send ── */
-  let sending = false;
-
+  /* send */
+  let busy = false;
   async function send() {
-    if (sending) return;
-    const msg = userInput.value.trim();
+    if (busy) return;
+    const msg = input.value.trim();
     if (!msg) return;
+    busy = true;
 
-    sending = true;
-    addMessage(msg, 'user');
-    userInput.value = '';
-    userInput.style.height = '24px';
-    userInput.disabled = true;
-    sendBtn.disabled   = true;
+    addMsg(msg, 'user');
+    input.value = ''; input.style.height = '24px';
+    input.disabled = true; sendBtn.disabled = true;
     statusText.textContent = 'thinking…';
-
-    startAvatar();
-    showTyping();
+    startAvatar(); showTyping();
 
     try {
-      const res  = await fetch('/chat', {
+      const res   = await fetch('/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({ message: msg })
       });
       const data  = await res.json();
       const reply = data.reply;
-
-      hideTyping();
-      stopAvatar();
+      hideTyping(); stopAvatar();
       statusText.textContent = 'online · ready';
 
       if (reply === '__UNLOCK__') {
-        addMessage('Yeah, That is true!!!', 'bot');
+        addMsg('Yeah, That is true!!!', 'bot');
         setTimeout(() => { window.location.href = '/unlock'; }, 1500);
       } else {
-        addMessage(reply, 'bot');
+        addMsg(reply, 'bot');
       }
-
     } catch (err) {
-      hideTyping();
-      stopAvatar();
+      hideTyping(); stopAvatar();
       statusText.textContent = 'online · ready';
-      addMessage('❌ Oops! I zoned out!!!', 'bot', 'error');
+      addMsg('❌ Oops! I zoned out!!!', 'bot', 'error');
       console.error(err);
     }
 
-    userInput.disabled = false;
-    sendBtn.disabled   = false;
-    sending = false;
-    userInput.focus();
+    input.disabled = false; sendBtn.disabled = false;
+    busy = false; input.focus();
   }
 
   sendBtn.addEventListener('click', send);
-  userInput.addEventListener('keydown', e => {
+  input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
-
   window.sendMessage = send;
-
 })();
 </script>
 
