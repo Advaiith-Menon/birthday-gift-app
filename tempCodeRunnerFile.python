@@ -1,19 +1,77 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import os
+from fpdf import FPDF
 
-# Access your token (ensure it's stored as an environment variable or directly paste it for quick test)
-token = os.environ["AM-HF"] # Use get, not () - avoids TypeError
+class InvoicePDF(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 26)
+        self.cell(0, 12, 'INVOICE', 0, 1, 'C')
+        self.ln(5)
 
-model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+pdf = InvoicePDF()
+pdf.set_auto_page_break(auto=True, margin=15)
+pdf.add_page()
+pdf.set_margins(20, 20, 20)
 
-# Load tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained(model_id, token=token)
-model = AutoModelForCausalLM.from_pretrained(model_id, token=token)
+# Longest label → set consistent width
+label_width = 30  
 
-# Test a simple response generation
-input_text = "What is the capital of France?"
-inputs = tokenizer(input_text, return_tensors="pt")
-outputs = model.generate(**inputs, max_new_tokens=50)
-response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+# Invoice Info
+pdf.set_font('Arial', 'B', 12)
+pdf.cell(label_width, 10, 'Date Issued:', 0, 0,'L')   # label column
+pdf.set_font('Arial', '', 12)
+pdf.cell(0, 10, '28 March 2025', 0, 1)            # value column
 
-print(response)
+pdf.set_font('Arial', 'B', 12)
+pdf.cell(label_width, 10, 'Issued To:', 0, 0,'L')     # same width as above
+pdf.set_font('Arial', '', 12)
+pdf.cell(0, 10, 'GEC TCR Staff Club', 0, 1)       # values aligned neatly
+
+pdf.ln(12)
+
+# Table Header
+pdf.set_font('Arial', 'B', 12)
+pdf.set_fill_color(230, 230, 230)
+pdf.cell(140, 10, 'Description', 0, 0, 'L', fill=True)
+pdf.cell(40, 10, 'Amount (Rs.)', 0, 1, 'R', fill=True)
+
+# Items
+pdf.set_font('Arial', '', 12)
+pdf.cell(140, 10, 'Photography', 0, 0)
+pdf.cell(40, 10, '2,000', 0, 1, 'R')
+
+pdf.cell(140, 10, 'Videography', 0, 0)
+pdf.cell(40, 10, '3,000', 0, 1, 'R')
+
+pdf.ln(4)
+
+# Divider
+pdf.set_draw_color(200, 200, 200)
+pdf.line(20, pdf.get_y(), 190, pdf.get_y())
+
+pdf.ln(6)
+pdf.set_font('Arial', '', 12)
+pdf.cell(140, 10, 'Subtotal', 0, 0, 'R')
+pdf.cell(40, 10, '5,000', 0, 1, 'R')
+
+pdf.cell(140, 10, 'Discount', 0, 0, 'R')
+pdf.cell(40, 10, '- 3,000', 0, 1, 'R')
+
+# Strong divider before total
+pdf.set_draw_color(0, 0, 0)
+pdf.line(20, pdf.get_y(), 190, pdf.get_y())
+
+pdf.ln(4)
+pdf.set_font('Arial', 'B', 14)
+pdf.cell(140, 12, 'Grand Total', 0, 0, 'R')
+pdf.cell(40, 12, 'Rs. 2,000', 0, 1, 'R')
+
+pdf.ln(20)
+
+# Footer
+pdf.set_font('Arial', 'B', 15)
+pdf.cell(0, 10, 'AmBest Studios', 0, 1, 'C')
+pdf.set_font('Arial', '', 8)
+line_height = 4 # smaller line height 
+pdf.cell(0, line_height, 'Email: ambestfilms@gmail.com', 0, 1, 'C') 
+pdf.cell(0, line_height, 'Contact: +91 99955 48885, +91 80868 66266', 0, 1, 'C')
+
+pdf.output('Formatted_Invoice.pdf')

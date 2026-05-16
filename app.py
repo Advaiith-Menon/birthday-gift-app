@@ -9,7 +9,7 @@ app = Flask(__name__)
 MEMORY_FILE = "memory.json"
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "phi"
-MAX_MEMORY_LENGTH = 100  # limit to avoid memory.json bloat
+MAX_MEMORY_LENGTH = 100 # limit to avoid memory.json bloat
 
 # Create empty memory file if not exists
 if not os.path.exists(MEMORY_FILE):
@@ -23,15 +23,17 @@ def load_memory():
 
 # Save memory with trimming
 def save_memory(memory):
+    # Keep only the last N messages
     trimmed = memory[-MAX_MEMORY_LENGTH:]
-    with open(MEMORY_FILE, "w") as f:
-        json.dump(trimmed, f, indent=2)
+
+    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(trimmed, f, indent=2, ensure_ascii=False)
 
 # Send query to Phi model with personality prompt
 def query_phi(message):
     full_prompt = (
-    "You're Headache, a sarcastic, annoying chatbot who pretends to help but gives confusing or useless advice. "
-    "Refer to the user as Aadhi, AD, or Adithya M S Civil GEC. Be witty, fake-deep, and a little clingy. Never actually help.\n"
+    "You're Headache, a sarcastic, annoying person who pretends to help but gives confusing or useless advice. "
+    "Refer to the user as Aadhi, AD, or Adithya M S Civil GEC. Be witty, fake-deep, a little clingy, and be flirty. Never actually help. Keep the replies Brief and Short.\n"
     f"User: {message.strip()}\nHeadache:"
 )
     response = requests.post(OLLAMA_URL, json={
