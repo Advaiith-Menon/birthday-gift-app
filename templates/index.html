@@ -67,11 +67,11 @@
     }
 
     .shell {
-      position: relative;
+      position: fixed;
+      top: 0; left: 0; right: 0;
       z-index: 1;
       display: flex;
       flex-direction: column;
-      height: 100vh;
       height: 100dvh;
       max-width: 780px;
       margin: 0 auto;
@@ -504,6 +504,17 @@
     });
 
     window.sendMessage = sendMessage;
+
+    /* Keep layout anchored when mobile keyboard opens */
+    if (window.visualViewport) {
+      const shell = document.querySelector('.shell');
+      function onViewportResize() {
+        shell.style.height = window.visualViewport.height + 'px';
+      }
+      window.visualViewport.addEventListener('resize', onViewportResize);
+      window.visualViewport.addEventListener('scroll', onViewportResize);
+      onViewportResize();
+    }
   });
 </script>
 
