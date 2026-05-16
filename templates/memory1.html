@@ -2,53 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Memory Page</title>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(  #faaad5, #f68db7 100%);
+      background: radial-gradient(ellipse at top, #faaad5, #f68db7 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 30px 20px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 24px 16px max(24px, env(safe-area-inset-bottom, 24px));
       color: #333;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;  
+      overflow-y: auto;
     }
 
-    .back-btn {
-      display: block;
-      text-align: center;
-      margin-top: 40px;
-      color: #999;
-      font-size: 1rem;
-      text-decoration: underline;
-      transition: color 0.3s ease;
-    }
-
-    .back-btn:hover {
-      color: #000;
-    }
-
+    /* ── Heart ── */
     .main-heart {
       position: relative;
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 24px;
+      flex-shrink: 0;
     }
 
     .heart-svg {
-      width: 25vw;
+      width: min(28vw, 120px);
       height: auto;
       fill: #e91e63;
-      animation: heartbeat 1.4s infinite;
+      animation: heartbeat 1.4s ease-in-out infinite;
+      display: block;
+      margin: 0 auto;
     }
 
     @keyframes heartbeat {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50%       { transform: scale(1.1); }
     }
 
     .heart-text {
@@ -57,51 +48,104 @@
       left: 50%;
       transform: translate(-50%, -50%);
       color: white;
-      font-size: 1.5rem;
+      font-size: clamp(0.6rem, 3vw, 1rem);
       font-weight: bold;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      line-height: 1.3;
     }
 
+    /* ── Notes ── */
     .text-boxes {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      max-width: 500px;
+      gap: 14px;
       width: 100%;
+      max-width: 500px;
     }
 
     .text-box {
       background-color: #ffe6eb;
-      padding: 15px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 14px 16px;
+      border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
       cursor: pointer;
-      transition: background-color 0.3s;
-      position: relative;
+      transition: background-color 0.25s;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .text-box:hover {
-      background-color: #ffd4dd;
-    }
+    .text-box:hover  { background-color: #ffd4dd; }
+    .text-box:active { background-color: #ffbfcd; }
 
     .text-box h3 {
-      margin: 0;
-      font-size: 1.1rem;
+      font-size: clamp(0.9rem, 3.5vw, 1.05rem);
       color: #c2185b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .text-box h3::after {
+      content: '▸';
+      font-size: 0.75rem;
+      color: #e91e63;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .text-box.active h3::after {
+      transform: rotate(90deg);
     }
 
     .content {
-      margin-top: 10px;
-      display: none;
-      font-size: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, margin-top 0.25s ease;
+      font-size: clamp(0.85rem, 3vw, 0.95rem);
       color: #555;
+      line-height: 1.6;
     }
 
     .text-box.active .content {
-      display: block;
+      max-height: 300px;
+      margin-top: 10px;
+    }
+
+    /* ── Back button ── */
+    .back-btn {
+      display: inline-block;
+      margin-top: 28px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 8px 20px;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.15);
+      transition: background 0.2s, color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back-btn:hover  { background: rgba(255,255,255,0.3); color: #fff; }
+    .back-btn:active { background: rgba(255,255,255,0.4); }
+    @media (min-width: 768px) {
+      body { padding: 50px 40px; }
+      .heart-svg { width: 280px; }
+      .heart-text { font-size: 1.6rem; line-height: 1.4; }
+      .main-heart { margin-bottom: 50px; }
+      .text-boxes { gap: 26px; max-width: 720px; }
+      .text-box { padding: 26px 32px; border-radius: 20px; }
+      .text-box h3 { font-size: 1.35rem; }
+      .text-box h3::after { font-size: 1rem; }
+      .content { font-size: 1.15rem; line-height: 1.75; }
+      .text-box.active .content { margin-top: 14px; }
+      .back-btn { font-size: 1.05rem; padding: 12px 36px; margin-top: 50px; }
     }
   </style>
 </head>
 <body>
+
   <div class="main-heart">
     <svg class="heart-svg" viewBox="0 0 32 29.6">
       <path d="M23.6,0c-3.4,0-6.4,2.6-7.6,4.1C14.8,2.6,11.8,0,8.4,0
@@ -114,7 +158,7 @@
   <div class="text-boxes">
     <div class="text-box">
       <h3>Note 1: What is "True Love"?</h3>
-      <div class="content">Love that has nothing to do with physical attraction...<br>Feeling happy when you're happy, calm when you are around and missing you while you are not around. </div>
+      <div class="content">Love that has nothing to do with physical attraction...<br>Feeling happy when you're happy, calm when you are around and missing you while you are not around.</div>
     </div>
 
     <div class="text-box">
@@ -128,14 +172,12 @@
     </div>
   </div>
 
+  <a href="/memory" class="back-btn">← Back to Home</a>
+
   <script>
-    // Toggle content visibility on click
     document.querySelectorAll('.text-box').forEach(box => {
-      box.addEventListener('click', () => {
-        box.classList.toggle('active');
-      });
+      box.addEventListener('click', () => box.classList.toggle('active'));
     });
   </script>
-    <a href="/memory" class="back-btn">⬅ Back to Home</a>
 </body>
 </html>

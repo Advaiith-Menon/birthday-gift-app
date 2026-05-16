@@ -228,7 +228,8 @@
     /* ── Back button ── */
     .back-btn {
       position: fixed;
-      bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      bottom: auto;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
       font-family: 'Cinzel', serif;
@@ -291,6 +292,7 @@
       bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 70px));
       left: 50%;
       transform: translateX(-50%);
+      display: none;
       font-family: 'Cinzel', serif;
       font-size: clamp(0.55rem, 2vw, 0.7rem);
       letter-spacing: 0.3em;
@@ -465,7 +467,7 @@
       orbitRing.style.width  = ringDiam + 'px';
       orbitRing.style.height = ringDiam + 'px';
 
-      // Center of screen (= center of main star)
+      // Button positions itself below the lowest star, so no offset needed
       const cx = vw / 2;
       const cy = vh / 2;
 
@@ -473,6 +475,8 @@
       connSvg.innerHTML = '';
       connSvg.setAttribute('width', vw);
       connSvg.setAttribute('height', vh);
+
+      let maxStarBottom = 0;
 
       miniStars.forEach((star, i) => {
         star.style.width  = miniSize + 'px';
@@ -486,10 +490,15 @@
 
         // Label position (below star, outward from center)
         const lbl = star.querySelector('.mini-star-label');
+        const labelFontSize = Math.max(9, minDim * 0.022);
         if (lbl) {
           lbl.style.top = (miniSize + 6) + 'px';
-          lbl.style.fontSize = Math.max(9, minDim * 0.022) + 'px';
+          lbl.style.fontSize = labelFontSize + 'px';
         }
+
+        // Track the lowest point (star bottom + label height)
+        const starBottom = sy + miniSize + labelFontSize + 10;
+        if (starBottom > maxStarBottom) maxStarBottom = starBottom;
 
         // Connector line
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -499,6 +508,11 @@
         line.setAttribute('y2', sy + miniSize / 2);
         connSvg.appendChild(line);
       });
+
+      // Position the back button just below the lowest star, clamped to viewport
+      const backBtn = document.querySelector('.back-btn');
+      const btnTop = Math.min(maxStarBottom + 16, vh - 52);
+      backBtn.style.top = btnTop + 'px';
     }
 
     /* ── Ripple effect ── */
