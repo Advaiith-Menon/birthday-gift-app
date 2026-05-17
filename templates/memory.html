@@ -10,15 +10,13 @@
 
     :root {
       --pink: #f89fee;
-      --pink-dim: #c76dbf;
       --gold: #ffe5a0;
       --star-white: #e8f0ff;
       --deep: #040610;
     }
 
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       overflow: hidden;
       background: var(--deep);
       color: white;
@@ -28,123 +26,101 @@
 
     /* ── Loader ── */
     #loader {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      background: var(--deep);
-      z-index: 9999;
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.5rem;
+      background: var(--deep); z-index: 9999;
       transition: opacity 0.8s ease;
     }
     #loader.hidden { opacity: 0; pointer-events: none; }
     #loader-text {
       font-family: 'Cinzel', serif;
       font-size: clamp(1.8rem, 8vw, 4rem);
-      font-weight: 600;
-      letter-spacing: 0.12em;
+      font-weight: 600; letter-spacing: 0.12em;
       color: var(--gold);
-      text-shadow: 0 0 40px rgba(255, 220, 120, 0.6), 0 0 80px rgba(255, 180, 80, 0.3);
+      text-shadow: 0 0 40px rgba(255,220,120,0.6), 0 0 80px rgba(255,180,80,0.3);
       animation: loaderPulse 1.4s ease-in-out infinite;
     }
     #loader-sub {
       font-size: clamp(0.85rem, 3vw, 1.1rem);
       color: rgba(255,255,255,0.35);
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      font-style: italic;
+      letter-spacing: 0.3em; text-transform: uppercase; font-style: italic;
     }
     @keyframes loaderPulse {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
+      0%,100% { opacity: 0.7; } 50% { opacity: 1; }
     }
 
-    /* ── Background nebula ── */
+    /* ── Background ── */
     .nebula {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
     }
     .nebula::before {
-      content: '';
-      position: absolute;
-      inset: 0;
+      content: ''; position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(100, 30, 120, 0.25) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(20, 50, 130, 0.22) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 55% 85%, rgba(180, 50, 100, 0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(100,30,120,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(20,50,130,0.22) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 55% 85%, rgba(180,50,100,0.14) 0%, transparent 60%),
         radial-gradient(ellipse at 50% 50%, #0d1128 0%, #040610 100%);
     }
 
-    /* ── Static background stars ── */
     #starfield {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
     }
 
-    /* ── Main scene ── */
+    /* ── Scene: full viewport, nothing overflows ── */
     .scene {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: fixed; inset: 0; z-index: 1;
+    }
+
+    /* Connector SVG fills scene */
+    #connectors {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      width: 100%; height: 100%;
+    }
+    #connectors line {
+      stroke: rgba(255,255,255,0.08);
+      stroke-width: 1; stroke-dasharray: 3 8;
     }
 
     /* ── Main star ── */
     .main-star {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       z-index: 5;
-      cursor: default;
+      cursor: pointer;
+      /* positioned by JS via transform */
       animation: mainPulse 3s ease-in-out infinite;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+    .main-star:hover {
+      filter: brightness(1.3);
+    }
+    .main-star:active {
+      transform: translate(-50%, -50%) scale(0.9) !important;
     }
     .main-star svg {
-      display: block;
-      width: 100%;
-      height: 100%;
+      display: block; width: 100%; height: 100%;
       fill: var(--pink);
-      filter: drop-shadow(0 0 18px rgba(248, 159, 238, 0.9)) drop-shadow(0 0 50px rgba(248, 159, 238, 0.4));
+      filter: drop-shadow(0 0 18px rgba(248,159,238,0.9)) drop-shadow(0 0 50px rgba(248,159,238,0.4));
     }
     .main-star-label {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Cinzel', serif;
-      font-size: clamp(0.65rem, 2.5vw, 1rem);
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      color: #1a0920;
-      z-index: 6;
-      pointer-events: none;
-      text-shadow: none;
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.08em;
+      color: #1a0920; z-index: 6; pointer-events: none;
     }
     @keyframes mainPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
-      50% { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.15); }
+      0%,100% { filter: brightness(1); }
+      50% { filter: brightness(1.15) drop-shadow(0 0 24px rgba(248,159,238,0.9)); }
     }
 
     /* ── Orbit ring ── */
     .orbit-ring {
       position: absolute;
-      top: 50%;
-      left: 50%;
       border-radius: 50%;
-      border: 1px dashed rgba(255, 255, 255, 0.07);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 2;
+      border: 1px dashed rgba(255,255,255,0.07);
+      pointer-events: none; z-index: 2;
       animation: ringRotate 60s linear infinite;
+      /* centered by JS */
     }
     @keyframes ringRotate {
       from { transform: translate(-50%, -50%) rotate(0deg); }
@@ -152,100 +128,64 @@
     }
 
     /* ── Mini stars ── */
-    .mini-stars { position: absolute; inset: 0; z-index: 4; }
-
     .mini-star {
       position: absolute;
-      cursor: pointer;
-      transform-origin: center;
-      transition: transform 0.25s ease, filter 0.25s ease;
+      cursor: pointer; z-index: 4;
+      transition: filter 0.25s ease;
     }
     .mini-star svg {
-      display: block;
-      width: 100%;
-      height: 100%;
+      display: block; width: 100%; height: 100%;
       fill: var(--star-white);
-      filter: drop-shadow(0 0 5px rgba(232, 240, 255, 0.8));
+      filter: drop-shadow(0 0 5px rgba(232,240,255,0.8));
       transition: fill 0.3s ease, filter 0.3s ease;
-    }
-    .mini-star:hover {
-      transform: scale(1.35) !important;
     }
     .mini-star:hover svg {
       fill: var(--gold);
-      filter: drop-shadow(0 0 10px rgba(255, 229, 160, 1)) drop-shadow(0 0 25px rgba(255, 200, 80, 0.6));
+      filter: drop-shadow(0 0 10px rgba(255,229,160,1)) drop-shadow(0 0 25px rgba(255,200,80,0.6));
     }
     .mini-star:active {
-      transform: scale(0.9) !important;
+      transform: scale(0.9);
     }
 
-    /* Memory label under each mini star */
     .mini-star-label {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      position: absolute; left: 50%; transform: translateX(-50%);
       white-space: nowrap;
-      font-family: 'Cinzel', serif;
-      font-size: clamp(0.5rem, 1.5vw, 0.7rem);
-      letter-spacing: 0.08em;
-      color: rgba(255, 255, 255, 0.55);
+      font-family: 'Cinzel', serif; letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.55);
       pointer-events: none;
       transition: opacity 0.25s ease, color 0.25s ease;
     }
-    .mini-star:hover .mini-star-label {
-      color: var(--gold);
-      opacity: 1;
-    }
+    .mini-star:hover .mini-star-label { color: var(--gold); }
 
-    /* Individual twinkling animations */
-    .mini-star:nth-child(1) { animation: miniFloat1 4s ease-in-out infinite; }
-    .mini-star:nth-child(2) { animation: miniFloat2 5s ease-in-out infinite; }
-    .mini-star:nth-child(3) { animation: miniFloat3 3.5s ease-in-out infinite; }
-    .mini-star:nth-child(4) { animation: miniFloat4 4.5s ease-in-out infinite; }
-    .mini-star:nth-child(5) { animation: miniFloat5 5.5s ease-in-out infinite; }
-    .mini-star:nth-child(6) { animation: miniFloat6 4s ease-in-out infinite 1s; }
-
-    @keyframes miniFloat1 { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.07)} }
-    @keyframes miniFloat2 { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.09)} }
-    @keyframes miniFloat3 { 0%,100%{opacity:.8;transform:scale(1)} 50%{opacity:.95;transform:scale(1.05)} }
-    @keyframes miniFloat4 { 0%,100%{opacity:.65;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
-    @keyframes miniFloat5 { 0%,100%{opacity:.75;transform:scale(1)} 50%{opacity:.9;transform:scale(1.06)} }
-    @keyframes miniFloat6 { 0%,100%{opacity:.55;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
-
-    /* ── Connector lines ── */
-    #connectors {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      pointer-events: none;
-    }
-    #connectors line {
-      stroke: rgba(255, 255, 255, 0.08);
-      stroke-width: 1;
-      stroke-dasharray: 3 8;
-    }
+    /* Staggered twinkle */
+    .mini-star:nth-child(1) { animation: mf1 4.0s ease-in-out infinite; }
+    .mini-star:nth-child(2) { animation: mf2 5.0s ease-in-out infinite; }
+    .mini-star:nth-child(3) { animation: mf3 3.5s ease-in-out infinite; }
+    .mini-star:nth-child(4) { animation: mf4 4.5s ease-in-out infinite; }
+    .mini-star:nth-child(5) { animation: mf5 5.5s ease-in-out infinite; }
+    .mini-star:nth-child(6) { animation: mf6 4.0s ease-in-out infinite 1s; }
+    @keyframes mf1 { 0%,100%{opacity:.7} 50%{opacity:1} }
+    @keyframes mf2 { 0%,100%{opacity:.6} 50%{opacity:1} }
+    @keyframes mf3 { 0%,100%{opacity:.8} 50%{opacity:.95} }
+    @keyframes mf4 { 0%,100%{opacity:.65} 50%{opacity:1} }
+    @keyframes mf5 { 0%,100%{opacity:.75} 50%{opacity:.9} }
+    @keyframes mf6 { 0%,100%{opacity:.55} 50%{opacity:1} }
 
     /* ── Back button ── */
     .back-btn {
       position: fixed;
-      bottom: auto;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 50%; transform: translateX(-50%);
       font-family: 'Cinzel', serif;
       font-size: clamp(0.7rem, 2.5vw, 0.85rem);
       letter-spacing: 0.2em;
       text-decoration: none;
       color: rgba(255,255,255,0.25);
       border: 1px solid rgba(255,255,255,0.1);
-      padding: 8px 20px;
-      border-radius: 40px;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      padding: 8px 20px; border-radius: 40px;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
       background: rgba(255,255,255,0.03);
       transition: color 0.3s, border-color 0.3s, background 0.3s;
-      z-index: 10000;
-      white-space: nowrap;
+      z-index: 10000; white-space: nowrap;
     }
     .back-btn:hover {
       color: rgba(255,255,255,0.8);
@@ -255,30 +195,22 @@
 
     /* ── Shooting star ── */
     .shooting-star {
-      position: fixed;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1;
+      position: fixed; width: 2px; height: 2px;
+      background: white; border-radius: 50%;
+      pointer-events: none; z-index: 1;
     }
     .shooting-star::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
+      content: ''; position: absolute; top: 0; right: 0;
       width: 60px; height: 1px;
       background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
       transform-origin: right center;
     }
 
-    /* ── Ripple on click ── */
+    /* ── Ripple ── */
     .ripple {
-      position: fixed;
-      border-radius: 50%;
+      position: fixed; border-radius: 50%;
       border: 1.5px solid rgba(248,159,238,0.5);
-      pointer-events: none;
-      z-index: 10;
+      pointer-events: none; z-index: 10;
       animation: rippleOut 0.7s ease-out forwards;
     }
     @keyframes rippleOut {
@@ -288,263 +220,237 @@
 
     /* ── Touch hint ── */
     .touch-hint {
-      position: fixed;
-      bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 70px));
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
+      position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
       font-family: 'Cinzel', serif;
-      font-size: clamp(0.55rem, 2vw, 0.7rem);
-      letter-spacing: 0.3em;
-      color: rgba(255,255,255,0.2);
-      white-space: nowrap;
+      font-size: clamp(0.55rem, 2vw, 0.7rem); letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.2); white-space: nowrap;
       animation: hintFade 4s ease-in-out 2s forwards;
-      pointer-events: none;
-      z-index: 9999;
+      pointer-events: none; z-index: 9999; opacity: 0;
     }
     @keyframes hintFade {
-      0%   { opacity: 0; }
-      20%  { opacity: 1; }
-      80%  { opacity: 1; }
-      100% { opacity: 0; }
+      0%{opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{opacity:0}
     }
   </style>
 </head>
 <body>
 
-  <!-- Loader -->
-  <div id="loader">
-    <div id="loader-text">Surprise!</div>
-    <div id="loader-sub">a sky just for you</div>
-  </div>
+<div id="loader">
+  <div id="loader-text">Surprise!</div>
+  <div id="loader-sub">a sky just for you</div>
+</div>
 
-  <!-- Background -->
-  <div class="nebula"></div>
-  <canvas id="starfield"></canvas>
+<div class="nebula"></div>
+<canvas id="starfield"></canvas>
 
-  <!-- Connector lines SVG -->
+<div class="scene" id="scene">
   <svg id="connectors"></svg>
+  <div class="orbit-ring" id="orbitRing"></div>
 
-  <!-- Main scene -->
-  <div class="scene">
-    <!-- Orbit ring placeholder; sized by JS -->
-    <div class="orbit-ring" id="orbitRing"></div>
-
-    <!-- Main star -->
-    <div class="main-star" id="mainStar">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/>
-      </svg>
-      <div class="main-star-label">Aadhi</div>
-    </div>
-
-    <!-- Mini memory stars -->
-    <div class="mini-stars" id="miniStars">
-      <div class="mini-star" data-label="Memory 1">
-        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-        <span class="mini-star-label">Memory 1</span>
-      </div>
-      <div class="mini-star" data-label="Memory 2">
-        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-        <span class="mini-star-label">Memory 2</span>
-      </div>
-      <div class="mini-star" data-label="Memory 3">
-        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-        <span class="mini-star-label">Memory 3</span>
-      </div>
-      <div class="mini-star" data-label="Memory 4">
-        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-        <span class="mini-star-label">Memory 4</span>
-      </div>
-      <div class="mini-star" data-label="Memory 5">
-        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-        <span class="mini-star-label">Memory 5</span>
-      </div>
-      <div class="mini-star" data-label="Memory 6">
-        <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
-        <span class="mini-star-label">Memory 6</span>
-      </div>
-    </div>
+  <div class="main-star" id="mainStar">
+    <svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg>
+    <div class="main-star-label" id="mainLabel">Aadhi</div>
   </div>
 
-  <!-- Touch hint -->
-  <div class="touch-hint">✦ tap a star ✦</div>
+  <div class="mini-star" id="ms0"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Memory 1</span></div>
+  <div class="mini-star" id="ms1"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Memory 2</span></div>
+  <div class="mini-star" id="ms2"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Memory 3</span></div>
+  <div class="mini-star" id="ms3"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Memory 4</span></div>
+  <div class="mini-star" id="ms4"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Memory 5</span></div>
+  <div class="mini-star" id="ms5"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Memory 6</span></div>
+</div>
 
-  <!-- Back button -->
-  <a href="/" class="back-btn">← Return</a>
+<div class="touch-hint">✦ tap a star ✦</div>
+<a href="/" class="back-btn" id="backBtn">← Return</a>
 
-  <script>
-    /* ── Starfield canvas ── */
-    const canvas = document.getElementById('starfield');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
+<script>
+/* ── Starfield ── */
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+function buildStars() {
+  stars = [];
+  const count = Math.min(600, Math.floor(window.innerWidth * window.innerHeight / 2200));
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2, alpha: Math.random() * 0.7 + 0.15,
+      speed: Math.random() * 0.8 + 0.2, phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+function drawStars(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (const s of stars) {
+    const a = s.alpha * (0.5 + 0.5 * Math.sin(t * 0.001 * s.speed + s.phase));
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(220,230,255,${a})`; ctx.fill();
+  }
+  requestAnimationFrame(drawStars);
+}
+resizeCanvas(); buildStars(); requestAnimationFrame(drawStars);
 
-    function buildStars() {
-      stars = [];
-      const count = Math.min(600, Math.floor(window.innerWidth * window.innerHeight / 2200));
-      for (let i = 0; i < count; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          r: Math.random() * 1.2 + 0.2,
-          alpha: Math.random() * 0.7 + 0.15,
-          speed: Math.random() * 0.8 + 0.2,
-          phase: Math.random() * Math.PI * 2
-        });
+/* ── Shooting stars ── */
+function shootingStar() {
+  const el = document.createElement('div');
+  el.className = 'shooting-star';
+  const sx = Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.2;
+  const sy = Math.random() * window.innerHeight * 0.3;
+  const angle = 20 + Math.random() * 30;
+  const dist = 200 + Math.random() * 200;
+  el.style.left = sx + 'px'; el.style.top = sy + 'px';
+  document.body.appendChild(el);
+  el.animate([
+    { transform: `translate(0,0) rotate(${angle}deg)`, opacity: 1 },
+    { transform: `translate(${dist * Math.cos(angle*Math.PI/180)}px,${dist * Math.sin(angle*Math.PI/180)}px) rotate(${angle}deg)`, opacity: 0 }
+  ], { duration: 700 + Math.random() * 400, easing: 'ease-out' }).onfinish = () => el.remove();
+}
+setInterval(() => { if (Math.random() < 0.6) shootingStar(); }, 3500);
+
+/* ── Layout ── */
+function placeStars() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // Safe area: leave padding so nothing clips to edge
+  const PAD = 32;
+  const usableW = vw - PAD * 2;
+  const usableH = vh - PAD * 2;
+
+  // Center of screen
+  const cx = vw / 2;
+  const cy = vh / 2;
+
+  // Size everything relative to the smaller usable dimension
+  // Cap so main star never dominates on large screens
+  const minUsable = Math.min(usableW, usableH);
+  const mainSize = Math.min(minUsable * 0.22, 130);
+
+  // Orbit radius: must keep mini stars inside safe area
+  // Max radius is half the smaller usable dim minus mini star size
+  const miniSize = Math.min(minUsable * 0.11, 70);
+  const maxRadius = (minUsable / 2) - miniSize - 8;
+  const radius = Math.min(maxRadius, minUsable * 0.36);
+
+  // Main star — always centered, transform-based
+  const mainStar = document.getElementById('mainStar');
+  mainStar.style.width = mainSize + 'px';
+  mainStar.style.height = mainSize + 'px';
+  mainStar.style.left = cx + 'px';
+  mainStar.style.top = cy + 'px';
+  mainStar.style.transform = 'translate(-50%, -50%)';
+  document.getElementById('mainLabel').style.fontSize = (mainSize * 0.18) + 'px';
+
+  // Orbit ring — centered with transform
+  const orbitRing = document.getElementById('orbitRing');
+  const ringDiam = (radius + miniSize * 0.5) * 2;
+  orbitRing.style.width = ringDiam + 'px';
+  orbitRing.style.height = ringDiam + 'px';
+  orbitRing.style.left = cx + 'px';
+  orbitRing.style.top = cy + 'px';
+  // transform set in CSS already: translate(-50%,-50%)
+
+  // Mini stars
+  const miniStars = document.querySelectorAll('.mini-star');
+  const connSvg = document.getElementById('connectors');
+  connSvg.innerHTML = '';
+
+  const labelFontSize = Math.max(9, minUsable * 0.020);
+
+  miniStars.forEach((star, i) => {
+    const angle = (i / miniStars.length) * 2 * Math.PI - Math.PI / 2;
+    // Star center coords
+    const scx = cx + radius * Math.cos(angle);
+    const scy = cy + radius * Math.sin(angle);
+
+    star.style.width = miniSize + 'px';
+    star.style.height = miniSize + 'px';
+    // Position by center using transform
+    star.style.left = scx + 'px';
+    star.style.top = scy + 'px';
+    star.style.transform = 'translate(-50%, -50%)';
+
+    const lbl = star.querySelector('.mini-star-label');
+    if (lbl) {
+      lbl.style.fontSize = labelFontSize + 'px';
+      // Place label outside the orbit (away from center)
+      const outward = Math.sin(angle) >= 0 ? 1 : -1;
+      // Always below star on top half, above star on bottom half
+      if (Math.sin(angle) >= -0.3) {
+        lbl.style.top = (miniSize + 4) + 'px';
+        lbl.style.bottom = 'auto';
+      } else {
+        lbl.style.bottom = (miniSize + 4) + 'px';
+        lbl.style.top = 'auto';
       }
     }
 
-    function drawStars(t) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const s of stars) {
-        const a = s.alpha * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220,230,255,${a})`;
-        ctx.fill();
-      }
-      requestAnimationFrame(drawStars);
-    }
+    // Connector line from center to star center
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+    line.setAttribute('x2', scx); line.setAttribute('y2', scy);
+    connSvg.appendChild(line);
+  });
 
-    resizeCanvas();
-    buildStars();
-    requestAnimationFrame(drawStars);
+  // Back button: just below the bottom-most star, clamped
+  const bottomStarY = cy + radius + miniSize / 2 + labelFontSize + 14;
+  const backBtn = document.getElementById('backBtn');
+  const btnY = Math.min(bottomStarY + 12, vh - 44);
+  backBtn.style.top = btnY + 'px';
+  backBtn.style.bottom = 'auto';
+}
 
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      buildStars();
-      placeStars();
-    });
+/* ── Ripple ── */
+function spawnRipple(x, y) {
+  const el = document.createElement('div');
+  el.className = 'ripple';
+  const size = 40;
+  el.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 700);
+}
 
-    /* ── Shooting stars ── */
-    function shootingStar() {
-      const el = document.createElement('div');
-      el.className = 'shooting-star';
-      const startX = Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.2;
-      const startY = Math.random() * window.innerHeight * 0.3;
-      const angle = 20 + Math.random() * 30;
-      const dist = 200 + Math.random() * 200;
-      el.style.left = startX + 'px';
-      el.style.top = startY + 'px';
-      document.body.appendChild(el);
+/* ── Navigation ── */
+// Center star → unlock.html
+document.getElementById('mainStar').addEventListener('click', e => {
+  const rect = document.getElementById('mainStar').getBoundingClientRect();
+  spawnRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  setTimeout(() => { window.location.href = '/unlock'; }, 350);
+});
 
-      el.animate([
-        { transform: 'translate(0,0) rotate('+angle+'deg)', opacity: 1 },
-        { transform: `translate(${dist * Math.cos(angle * Math.PI/180)}px, ${dist * Math.sin(angle * Math.PI/180)}px) rotate(${angle}deg)`, opacity: 0 }
-      ], { duration: 700 + Math.random() * 400, easing: 'ease-out' }).onfinish = () => el.remove();
-    }
+// Mini stars → memory pages
+document.querySelectorAll('.mini-star').forEach((star, i) => {
+  star.addEventListener('click', e => {
+    e.stopPropagation();
+    const rect = star.getBoundingClientRect();
+    spawnRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    setTimeout(() => { window.location.href = `/memory${i + 1}`; }, 350);
+  });
+});
 
-    setInterval(() => { if (Math.random() < 0.6) shootingStar(); }, 3500);
+/* ── Init ── */
+window.addEventListener('load', () => {
+  placeStars();
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 1000);
+});
 
-    /* ── Layout ── */
-    function placeStars() {
-      const mainStar = document.getElementById('mainStar');
-      const miniStars = document.querySelectorAll('.mini-star');
-      const orbitRing = document.getElementById('orbitRing');
-      const connSvg = document.getElementById('connectors');
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    resizeCanvas(); buildStars(); placeStars();
+  }, 100);
+});
 
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const minDim = Math.min(vw, vh);
-
-      const mainSize = minDim * 0.25;
-      const miniSize = minDim * 0.13;
-      const radius   = minDim * 0.38;
-      const labelOffset = miniSize * 0.6;
-
-      // Main star
-      mainStar.style.width  = mainSize + 'px';
-      mainStar.style.height = mainSize + 'px';
-      mainStar.querySelector('.main-star-label').style.fontSize = (mainSize * 0.18) + 'px';
-
-      // Orbit ring
-      const ringDiam = radius * 2 + miniSize;
-      orbitRing.style.width  = ringDiam + 'px';
-      orbitRing.style.height = ringDiam + 'px';
-
-      // Button positions itself below the lowest star, so no offset needed
-      const cx = vw / 2;
-      const cy = vh / 2;
-
-      // Clear connectors
-      connSvg.innerHTML = '';
-      connSvg.setAttribute('width', vw);
-      connSvg.setAttribute('height', vh);
-
-      let maxStarBottom = 0;
-
-      miniStars.forEach((star, i) => {
-        star.style.width  = miniSize + 'px';
-        star.style.height = miniSize + 'px';
-
-        const angle = (i / miniStars.length) * 2 * Math.PI - Math.PI / 2;
-        const sx = cx + radius * Math.cos(angle) - miniSize / 2;
-        const sy = cy + radius * Math.sin(angle) - miniSize / 2;
-        star.style.left = sx + 'px';
-        star.style.top  = sy + 'px';
-
-        // Label position (below star, outward from center)
-        const lbl = star.querySelector('.mini-star-label');
-        const labelFontSize = Math.max(9, minDim * 0.022);
-        if (lbl) {
-          lbl.style.top = (miniSize + 6) + 'px';
-          lbl.style.fontSize = labelFontSize + 'px';
-        }
-
-        // Track the lowest point (star bottom + label height)
-        const starBottom = sy + miniSize + labelFontSize + 10;
-        if (starBottom > maxStarBottom) maxStarBottom = starBottom;
-
-        // Connector line
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', cx);
-        line.setAttribute('y1', cy);
-        line.setAttribute('x2', sx + miniSize / 2);
-        line.setAttribute('y2', sy + miniSize / 2);
-        connSvg.appendChild(line);
-      });
-
-      // Position the back button just below the lowest star, clamped to viewport
-      const backBtn = document.querySelector('.back-btn');
-      const btnTop = Math.min(maxStarBottom + 16, vh - 52);
-      backBtn.style.top = btnTop + 'px';
-    }
-
-    /* ── Ripple effect ── */
-    function spawnRipple(x, y) {
-      const el = document.createElement('div');
-      el.className = 'ripple';
-      const size = 40;
-      el.style.cssText = `width:${size}px;height:${size}px;left:${x - size/2}px;top:${y - size/2}px`;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 700);
-    }
-
-    /* ── Navigation ── */
-    document.querySelectorAll('.mini-star').forEach((star, i) => {
-      star.addEventListener('click', e => {
-        const rect = star.getBoundingClientRect();
-        spawnRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
-        setTimeout(() => { window.location.href = `/memory${i + 1}`; }, 350);
-      });
-    });
-
-    /* ── Init ── */
-    window.addEventListener('load', () => {
-      placeStars();
-      setTimeout(() => {
-        document.getElementById('loader').classList.add('hidden');
-      }, 1000);
-    });
-
-    window.addEventListener('orientationchange', () => {
-      setTimeout(placeStars, 150);
-    });
-  </script>
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => { resizeCanvas(); buildStars(); placeStars(); }, 200);
+});
+</script>
 </body>
 </html>
