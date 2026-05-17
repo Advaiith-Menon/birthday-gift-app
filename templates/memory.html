@@ -117,14 +117,14 @@
     .orbit-ring {
       position: absolute;
       border-radius: 50%;
-      border: 1px dashed rgba(255,255,255,0.07);
+      border: 1px dashed rgba(255,255,255,0.12);
       pointer-events: none; z-index: 2;
+      transform-origin: center center;
       animation: ringRotate 60s linear infinite;
-      /* centered by JS */
     }
     @keyframes ringRotate {
-      from { transform: translate(-50%, -50%) rotate(0deg); }
-      to   { transform: translate(-50%, -50%) rotate(360deg); }
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
 
     /* ── Mini stars ── */
@@ -253,9 +253,9 @@
 
   <div class="mini-star" id="ms0"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">True Love</span></div>
   <div class="mini-star" id="ms1"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Music</span></div>
-  <div class="mini-star" id="ms2"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Age slider</span></div>
+  <div class="mini-star" id="ms2"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Age Slider</span></div>
   <div class="mini-star" id="ms3"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Drawings</span></div>
-  <div class="mini-star" id="ms4"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Comic</span></div>
+  <div class="mini-star" id="ms4"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Comics</span></div>
   <div class="mini-star" id="ms5"><svg viewBox="0 0 24 24"><path d="M12 .587l3.668 7.568L24 9.423l-6 5.858L19.336 24 12 19.771 4.664 24 6 15.281 0 9.423l8.332-1.268z"/></svg><span class="mini-star-label">Movie</span></div>
 </div>
 
@@ -345,14 +345,14 @@ function placeStars() {
   mainStar.style.transform = 'translate(-50%, -50%)';
   document.getElementById('mainLabel').style.fontSize = (mainSize * 0.18) + 'px';
 
-  // Orbit ring — centered with transform
+  // Orbit ring — positioned by top-left so it exactly passes through the mini star centers
   const orbitRing = document.getElementById('orbitRing');
-  const ringDiam = (radius + miniSize * 0.5) * 2;
+  const ringDiam = radius * 2;
   orbitRing.style.width = ringDiam + 'px';
   orbitRing.style.height = ringDiam + 'px';
-  orbitRing.style.left = cx + 'px';
-  orbitRing.style.top = cy + 'px';
-  // transform set in CSS already: translate(-50%,-50%)
+  // top-left = center minus radius
+  orbitRing.style.left = (cx - radius) + 'px';
+  orbitRing.style.top = (cy - radius) + 'px';
 
   // Mini stars
   const miniStars = document.querySelectorAll('.mini-star');
@@ -415,11 +415,11 @@ function spawnRipple(x, y) {
 }
 
 /* ── Navigation ── */
-
+// Center star → unlock.html
 document.getElementById('mainStar').addEventListener('click', e => {
   const rect = document.getElementById('mainStar').getBoundingClientRect();
   spawnRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
-  setTimeout(() => { window.location.href = '/aadhi'; }, 350);
+  setTimeout(() => { window.location.href = '/unlock'; }, 350);
 });
 
 // Mini stars → memory pages
