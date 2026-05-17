@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Headache-AI</title>
 
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -18,7 +18,6 @@
 
     :root {
       --bg:       #080b12;
-      --surface:  #0e1320;
       --surface2: #141927;
       --border:   rgba(255,255,255,0.07);
       --border2:  rgba(255,255,255,0.12);
@@ -30,29 +29,19 @@
       --glow:     rgba(123,97,255,0.18);
     }
 
-    /*
-      THE KEY INSIGHT:
-      - html+body fill the viewport as a flex column
-      - header is sticky (stays at top, part of normal flow)
-      - #main takes up remaining space with flex:1
-      - When keyboard opens on mobile, the viewport shrinks,
-        the whole column shrinks, and the input naturally rises.
-        No JS needed for keyboard handling.
-    */
-
-    html {
-      height: 100%;
-      background: var(--bg);
-    }
-
-    body {
+    html, body {
       height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', sans-serif;
       font-size: 15px;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
+      /* overflow hidden on body so only #chat-log scrolls */
+      overflow: hidden;
     }
 
     body::before {
@@ -65,14 +54,13 @@
       pointer-events: none;
     }
 
-    /* ── HEADER: sticky, never scrolls away ── */
+    /* ── HEADER ── */
     #app-header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
       background: var(--bg);
       border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
     }
 
     .header-inner {
@@ -99,17 +87,13 @@
       width: 100%; height: 100%;
       object-fit: cover;
     }
-
     .avatar-ring {
       position: absolute; inset: -5px;
       border-radius: 50%;
       border: 1.5px solid var(--accent);
       opacity: 0; transition: opacity 0.3s;
     }
-    .avatar-ring.active {
-      opacity: 1;
-      animation: ringPulse 1.2s ease-in-out infinite;
-    }
+    .avatar-ring.active { opacity: 1; animation: ringPulse 1.2s ease-in-out infinite; }
     @keyframes ringPulse {
       0%, 100% { transform: scale(1);    opacity: 0.9; }
       50%       { transform: scale(1.18); opacity: 0.15; }
@@ -133,10 +117,10 @@
     }
     @keyframes dotBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* ── MAIN: flex column, fills all space below header ── */
+    /* ── MAIN ── */
     #main {
       flex: 1;
-      min-height: 0;          /* lets it shrink when keyboard opens */
+      min-height: 0;
       display: flex;
       flex-direction: column;
       max-width: 780px;
@@ -145,11 +129,12 @@
       padding: 0 16px;
     }
 
-    /* ── CHAT LOG: scrollable, fills remaining space ── */
+    /* ── CHAT LOG ── */
     #chat-log {
       flex: 1;
-      min-height: 0;          /* critical — without this it won't scroll */
+      min-height: 0;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 24px 0 8px;
       display: flex;
       flex-direction: column;
@@ -158,10 +143,8 @@
       scrollbar-color: var(--border2) transparent;
     }
     #chat-log::-webkit-scrollbar { width: 4px; }
-    #chat-log::-webkit-scrollbar-track { background: transparent; }
     #chat-log::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-    /* messages */
     .msg { display: flex; max-width: 85%; animation: msgIn 0.22s ease-out both; }
     @keyframes msgIn {
       from { opacity: 0; transform: translateY(8px); }
@@ -173,36 +156,28 @@
     .bubble {
       padding: 10px 15px;
       border-radius: 18px;
-      line-height: 1.65;
-      font-size: 0.9rem;
+      line-height: 1.65; font-size: 0.9rem;
       word-break: break-word;
     }
     .user .bubble {
       background: linear-gradient(135deg, #5d3aff, #8b68ff);
-      color: #fff;
-      border-bottom-right-radius: 5px;
+      color: #fff; border-bottom-right-radius: 5px;
       box-shadow: 0 2px 18px rgba(93,58,255,0.28);
     }
     .bot .bubble {
-      background: var(--surface2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 5px;
+      background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border); border-bottom-left-radius: 5px;
     }
     .bubble.error {
       background: rgba(239,68,68,0.1);
-      border-color: rgba(239,68,68,0.3);
-      color: #fca5a5;
+      border-color: rgba(239,68,68,0.3); color: #fca5a5;
     }
 
-    /* typing */
     .typing-bubble {
       display: flex; align-items: center; gap: 5px;
       padding: 12px 16px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      border-bottom-left-radius: 5px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 18px; border-bottom-left-radius: 5px;
     }
     .dot {
       width: 6px; height: 6px; border-radius: 50%;
@@ -216,59 +191,47 @@
       30%            { transform: translateY(-5px); opacity: 1; }
     }
 
-    /* intro */
     .intro {
       align-self: center; text-align: center;
       padding: 48px 20px;
       color: var(--muted); font-size: 0.85rem; line-height: 1.9;
     }
     .intro-title {
-      display: block;
-      font-family: 'Space Mono', monospace;
-      font-size: 1.2rem; color: var(--accent2);
-      margin-bottom: 6px;
+      display: block; font-family: 'Space Mono', monospace;
+      font-size: 1.2rem; color: var(--accent2); margin-bottom: 6px;
     }
 
     .divider { flex-shrink: 0; height: 1px; background: var(--border); }
 
-    /* ── INPUT: always visible at bottom ── */
+    /* ── INPUT ── */
     .input-wrap {
       flex-shrink: 0;
       padding: 12px 0;
       padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
     }
-
     .input-box {
       display: flex; align-items: flex-end; gap: 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 16px;
-      padding: 10px 10px 10px 16px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 16px; padding: 10px 10px 10px 16px;
       transition: border-color 0.25s, box-shadow 0.25s;
     }
     .input-box:focus-within {
       border-color: rgba(123,97,255,0.5);
       box-shadow: 0 0 0 3px rgba(123,97,255,0.1);
     }
-
     #user-input {
-      flex: 1; background: transparent;
-      border: none; outline: none;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text); font-family: 'Inter', sans-serif;
       font-size: 0.9rem; line-height: 1.55;
-      resize: none;
-      height: 24px; max-height: 120px; overflow-y: hidden;
+      resize: none; height: 24px; max-height: 120px; overflow-y: hidden;
     }
     #user-input::placeholder { color: var(--muted); }
 
     #send-btn {
-      width: 38px; height: 38px;
-      border-radius: 10px; border: none;
+      width: 38px; height: 38px; border-radius: 10px; border: none;
       background: linear-gradient(135deg, #5d3aff, #8b68ff);
       color: #fff; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
       box-shadow: 0 2px 14px rgba(93,58,255,0.4);
     }
@@ -279,7 +242,6 @@
 </head>
 <body>
 
-  <!-- STICKY HEADER — sticks to top of viewport, shrinks with it when keyboard opens -->
   <header id="app-header">
     <div class="header-inner">
       <div class="avatar-wrap">
@@ -300,7 +262,6 @@
     </div>
   </header>
 
-  <!-- MAIN — flex:1, shrinks when keyboard opens, input stays visible -->
   <div id="main">
     <div id="chat-log">
       <div class="intro">
@@ -308,9 +269,7 @@
         I'm listening. Say something.
       </div>
     </div>
-
     <div class="divider"></div>
-
     <div class="input-wrap">
       <div class="input-box">
         <textarea id="user-input" placeholder="Type something…" rows="1"></textarea>
@@ -326,6 +285,7 @@
 
 <script>
 (function () {
+
   const chatLog    = document.getElementById('chat-log');
   const input      = document.getElementById('user-input');
   const sendBtn    = document.getElementById('send-btn');
@@ -334,11 +294,45 @@
   const avIdle     = document.getElementById('av-idle');
   const avA        = document.getElementById('av-a');
   const avB        = document.getElementById('av-b');
+  const main       = document.getElementById('main');
+  const header     = document.getElementById('app-header');
 
-  /* auto-scroll whenever anything changes in the chat */
+  /* ─────────────────────────────────────────
+     KEYBOARD HANDLING
+     Uses visualViewport API which gives us
+     the exact visible area excluding keyboard.
+     We set body height = visualViewport.height
+     so the whole layout compresses correctly.
+  ───────────────────────────────────────── */
+  function applyViewport() {
+    const vh = window.visualViewport.height;
+    document.body.style.height = vh + 'px';
+    // scroll to bottom after resize settles
+    requestAnimationFrame(() => {
+      chatLog.scrollTop = chatLog.scrollHeight;
+    });
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', applyViewport);
+    window.visualViewport.addEventListener('scroll', applyViewport);
+    applyViewport();
+  }
+
+  /* ─────────────────────────────────────────
+     AUTO-SCROLL on any chat DOM change
+  ───────────────────────────────────────── */
   new MutationObserver(() => {
     chatLog.scrollTop = chatLog.scrollHeight;
   }).observe(chatLog, { childList: true, subtree: true });
+
+  /* ─────────────────────────────────────────
+     KEYBOARD DISMISS after send
+     blur() removes focus → keyboard goes away
+  ───────────────────────────────────────── */
+  function dismissKeyboard() {
+    input.blur();
+  }
 
   /* textarea auto-grow */
   input.addEventListener('input', () => {
@@ -401,10 +395,14 @@
     input.value = ''; input.style.height = '24px';
     input.disabled = true; sendBtn.disabled = true;
     statusText.textContent = 'thinking…';
+
+    /* dismiss keyboard immediately after send */
+    dismissKeyboard();
+
     startAvatar(); showTyping();
 
     try {
-      const res   = await fetch('/chat', {
+      const res  = await fetch('/chat', {
         method : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify({ message: msg })
@@ -428,7 +426,8 @@
     }
 
     input.disabled = false; sendBtn.disabled = false;
-    busy = false; input.focus();
+    busy = false;
+    /* do NOT re-focus — user must tap to bring keyboard back */
   }
 
   sendBtn.addEventListener('click', send);
@@ -436,6 +435,7 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
   window.sendMessage = send;
+
 })();
 </script>
 
