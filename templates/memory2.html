@@ -1,538 +1,873 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Songs By Me</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Songs By Me</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#08080f;--surf:#0f0f1e;--card:rgba(255,255,255,.04);--hover:rgba(255,255,255,.065);
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#f5e0a0;
+  --txt:#f0ece3;--t2:#6e6a82;--t3:#2e2c40;
+  --BAR:80px;
+}
+html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
 
-    :root {
-      --bg:      #07070f;
-      --panel:   #0c0c17;
-      --card:    rgba(255,255,255,0.035);
-      --hover:   rgba(255,255,255,0.055);
-      --b1:      rgba(255,255,255,0.07);
-      --b2:      rgba(255,255,255,0.12);
-      --gold:    #c9a84c;
-      --gold2:   #e8cc7a;
-      --gold3:   #f5e0a0;
-      --text:    #f0ece3;
-      --t2:      #6e6a62;
-      --t3:      #38342e;
-    }
+.app{position:relative;width:100%;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
 
-    html, body {
-      height: 100%; height: 100dvh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow: hidden;
-    }
+.orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(90px);z-index:0}
+.orb1{width:600px;height:600px;top:-200px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,.09),transparent 70%)}
+.orb2{width:400px;height:400px;bottom:100px;right:-100px;background:radial-gradient(circle,rgba(100,70,200,.07),transparent 70%)}
 
-    body::after {
-      content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
-      background-size: 180px; opacity: 0.02;
-    }
+.page{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;
+  padding-bottom:calc(var(--BAR) + 16px);scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
 
-    /* 420px left, rest right */
-    .app {
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      height: 100dvh;
-      overflow: hidden;
-    }
+.hdr{padding:52px 32px 24px}
+.hdr-eye{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:600;
+  display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hdr-eye::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(201,168,76,.35),transparent)}
+.hdr-name{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,8vw,4.2rem);font-style:italic;
+  font-weight:300;line-height:1;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--txt) 0%,var(--gold2) 60%,var(--txt) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-size:12px;color:var(--t2)}
 
-    /* ── LEFT ── */
-    .left {
-      background: var(--panel);
-      border-right: 1px solid var(--b1);
-      display: flex; flex-direction: column;
-      overflow: hidden; position: relative;
-    }
-    .left::before {
-      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-      background: radial-gradient(ellipse 120% 50% at 50% -5%, rgba(201,168,76,0.08), transparent 60%);
-    }
-    .lscroll {
-      flex: 1; overflow-y: auto; overflow-x: hidden;
-      padding: 40px 36px 28px;
-      position: relative; z-index: 1;
-      scrollbar-width: none; display: flex; flex-direction: column;
-    }
-    .lscroll::-webkit-scrollbar { display: none; }
+.plist{padding:0 20px 8px}
 
-    .brand { margin-bottom: 32px; }
-    .brand-eye { font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 5px; }
-    .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-style: italic; font-weight: 300; line-height: 1; color: var(--text); }
-    .brand-sub { font-size: 11px; color: var(--t2); margin-top: 6px; letter-spacing: .04em; }
+.track{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:16px;cursor:pointer;
+  border:1px solid transparent;transition:background .18s,border-color .18s,transform .18s;position:relative}
+.track::after{content:'';position:absolute;bottom:0;left:76px;right:14px;height:1px;background:var(--b1)}
+.track:last-child::after{display:none}
+.track:hover{background:var(--hover);transform:translateX(4px);border-color:var(--b1)}
+.track:hover::after,.track.now::after{display:none}
+.track.now{background:linear-gradient(135deg,rgba(201,168,76,.09),rgba(100,70,200,.06));
+  border-color:rgba(201,168,76,.22);transform:translateX(4px)}
 
-    .art-wrap { position: relative; margin-bottom: 30px; }
-    .art-glow {
-      position: absolute; inset: -20px; border-radius: 50%; pointer-events: none;
-      background: radial-gradient(circle, rgba(201,168,76,0.2) 0%, transparent 70%);
-      opacity: 0; transition: opacity 1s ease;
-    }
-    .art-glow.on { opacity: 1; animation: glow-breathe 3.5s ease-in-out infinite; }
-    @keyframes glow-breathe { 0%,100%{transform:scale(.9);opacity:.5} 50%{transform:scale(1.05);opacity:1} }
+.t-idx{width:28px;text-align:center;flex-shrink:0}
+.t-num{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
+.track.now .t-num{display:none}
+.eq{display:none;align-items:flex-end;justify-content:center;gap:2.5px;height:14px}
+.track.now .eq{display:flex}
+.eqb{width:3px;height:14px;border-radius:2px;background:var(--gold2);transform-origin:bottom center;transform:scaleY(.18);animation:eqanim var(--d) ease-in-out infinite alternate}
+@keyframes eqanim{from{transform:scaleY(.18)}to{transform:scaleY(var(--s))}}
 
-    .artwork {
-      width: 100%; aspect-ratio: 1; border-radius: 24px;
-      background: #0a0a15; border: 1px solid var(--b2);
-      display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-      box-shadow: 0 40px 100px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.025);
-    }
-    .artwork::before {
-      content: ''; position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(135deg, rgba(232,204,122,.07) 0%, transparent 45%);
-    }
+.t-art{width:54px;height:54px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--b1);position:relative;overflow:hidden;transition:all .22s}
+.t-art::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 60%,transparent 100%);z-index:1;pointer-events:none}
+.t-art svg{position:relative;z-index:2;flex-shrink:0}
+.track:hover .t-art{transform:scale(1.07);border-color:var(--b2)}
+.track.now .t-art{border-color:rgba(201,168,76,.4);box-shadow:0 0 24px rgba(201,168,76,.18)}
 
-    .arm {
-      position: absolute; top: 14px; right: 18px;
-      width: 90px; height: 90px;
-      transform-origin: 82% 10%;
-      transform: rotate(-28deg);
-      transition: transform 1.2s cubic-bezier(.25,.46,.45,.94);
-      pointer-events: none; z-index: 10;
-    }
-    .arm.on { transform: rotate(-5deg); }
+.t-info{flex:1;min-width:0}
+.t-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;transition:color .2s}
+.track.now .t-title{color:var(--gold2)}
+.t-sub{font-size:11px;color:var(--t2)}
+.t-dur{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
 
-    .vinyl {
-      width: 75%; aspect-ratio: 1; border-radius: 50%;
-      position: relative; will-change: transform;
-      background:
-        radial-gradient(circle, #1e1e28 0%, #1e1e28 16%, transparent 16.5%),
-        repeating-conic-gradient(from 0deg, #0f0f18 0deg 2deg, #161620 2deg 4deg);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 0 0 2px rgba(0,0,0,.7), inset 0 0 50px rgba(0,0,0,.5), 0 12px 40px rgba(0,0,0,.7);
-      transition: filter .7s ease;
-    }
-    .vinyl.playing { animation: spin 7s linear infinite; }
-    .vinyl.dim { filter: brightness(.45) saturate(.6); }
-    @keyframes spin { to { transform: rotate(360deg); } }
+/* add-to-queue button on track row */
+.t-add{
+  width:28px;height:28px;border-radius:50%;border:none;background:none;
+  color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s,color .15s,background .15s;flex-shrink:0;
+}
+.track:hover .t-add{opacity:1}
+.t-add:hover{color:var(--gold2);background:rgba(201,168,76,.1)}
+.t-add svg{width:16px;height:16px}
 
-    .vinyl-label {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 28%; aspect-ratio: 1; border-radius: 50%;
-      background: conic-gradient(from 135deg, #3a2506, var(--gold), var(--gold2), var(--gold3), var(--gold), #3a2506);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem; z-index: 2;
-      box-shadow: 0 2px 18px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.1);
-    }
-    .vinyl::before {
-      content: ''; position: absolute; inset: 0; border-radius: 50%;
-      background: radial-gradient(ellipse 55% 35% at 28% 18%, rgba(255,255,255,.07), transparent 55%);
-      z-index: 1; pointer-events: none;
-    }
+/* ── BOTTOM BAR ── */
+.bar{position:relative;z-index:10;flex-shrink:0;height:var(--BAR);display:flex;align-items:center;gap:12px;
+  padding:0 18px;padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(9,9,20,.92);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+  border-top:1px solid var(--b2);cursor:pointer;transition:opacity .3s}
+.bar.ghost{opacity:0;pointer-events:none}
+.bar-prog{position:absolute;top:0;left:0;height:2px;background:linear-gradient(to right,var(--gold),var(--gold2));border-radius:0 1px 0 0;transition:width .35s linear}
 
-    .track-info { margin-bottom: 16px; }
-    .track-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem; font-style: italic; font-weight: 400;
-      line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin-bottom: 8px;
-    }
-    @keyframes title-in { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
-    .track-title.anim { animation: title-in .35s ease forwards; }
-    .track-tags { display: flex; align-items: center; gap: 9px; }
-    .tag-lang { font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,.32); padding: 2px 9px; border-radius: 3px; }
-    .tag-type { font-size: 11px; color: var(--t2); }
+.bar-disc{width:50px;height:50px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#18182e,#0e0e1c);border:1px solid var(--b2);position:relative;overflow:hidden;transition:box-shadow .4s;will-change:transform}
+.bar-disc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent);z-index:1}
+.bar-disc svg{position:relative;z-index:2}
+.bar-disc.spin{animation:spinDisc 6s linear infinite}
+@keyframes spinDisc{to{transform:rotate(360deg)}}
 
-    .viz-wrap { width: 100%; height: 42px; margin-bottom: 22px; border-radius: 7px; overflow: hidden; background: rgba(255,255,255,.013); }
-    #viz { width: 100%; height: 100%; display: block; }
+.bar-info{flex:1;min-width:0}
+.bar-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.bar-sub{font-size:11px;color:var(--t2)}
 
-    .prog-area { margin-bottom: 26px; }
-    .prog-row { position: relative; height: 24px; display: flex; align-items: center; cursor: pointer; margin-bottom: 6px; }
-    .prog-track { position: absolute; left: 0; right: 0; height: 3px; border-radius: 2px; background: rgba(255,255,255,.07); pointer-events: none; }
-    .prog-fill { height: 100%; width: 0%; border-radius: 2px; background: linear-gradient(to right, #5a3e10, var(--gold2)); pointer-events: none; }
-    .prog-thumb {
-      position: absolute; left: 0%; width: 14px; height: 14px; border-radius: 50%;
-      background: var(--gold2); transform: translateX(-50%);
-      box-shadow: 0 0 0 3px rgba(232,204,122,.22), 0 0 16px rgba(232,204,122,.45);
-      pointer-events: none; z-index: 2; transition: transform .12s;
-    }
-    .prog-row:hover .prog-thumb { transform: translateX(-50%) scale(1.3); }
-    .prog-input { position: absolute; left: 0; right: 0; width: 100%; height: 24px; opacity: 0; cursor: pointer; z-index: 3; -webkit-appearance: none; appearance: none; }
-    .time-row { display: flex; justify-content: space-between; font-size: 10px; color: var(--t2); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.bar-btn{background:none;border:none;color:var(--t2);cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,transform .12s;flex-shrink:0}
+.bar-btn:hover{color:var(--txt);background:rgba(255,255,255,.07)}
+.bar-btn:active{transform:scale(.82)}
+.bar-btn svg{width:20px;height:20px}
+.bar-playbtn{width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--gold),#b8893a);color:#06060e;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 22px rgba(201,168,76,.5);transition:transform .15s,box-shadow .2s}
+.bar-playbtn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(201,168,76,.65)}
+.bar-playbtn:active{transform:scale(.9)}
+.bar-playbtn svg{width:20px;height:20px;margin-left:2px}
+.bar-up{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;flex-shrink:0}
+.bar-up:hover{color:var(--txt);background:rgba(255,255,255,.13)}
+.bar-up svg{width:15px;height:15px}
 
-    .controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; }
-    .ctrl { background: none; border: none; color: var(--t2); cursor: pointer; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: color .2s, background .2s, transform .12s; }
-    .ctrl:hover { color: var(--text); background: rgba(255,255,255,.05); }
-    .ctrl:active { transform: scale(.82); }
-    .ctrl.active { color: var(--gold2); }
-    .ctrl svg { width: 19px; height: 19px; }
-    .skip { background: rgba(255,255,255,.05); border: 1px solid var(--b1); width: 46px; height: 46px; border-radius: 50%; color: var(--text); transition: background .2s, transform .12s, box-shadow .2s; }
-    .skip:hover { background: rgba(255,255,255,.09); box-shadow: 0 4px 18px rgba(0,0,0,.35); }
-    .skip svg { width: 21px; height: 21px; }
-    .playpause {
-      width: 68px; height: 68px; border-radius: 50%; border: none; cursor: pointer;
-      background: conic-gradient(from 135deg, #c9a84c, #e8cc7a, #f5e0a0, #e8cc7a, #c9a84c);
-      color: #06060e; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 1px rgba(232,204,122,.25), 0 8px 36px rgba(201,168,76,.55);
-      transition: transform .15s, box-shadow .2s; flex-shrink: 0; position: relative; overflow: hidden;
-    }
-    .playpause::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(ellipse 60% 45% at 35% 25%, rgba(255,255,255,.28), transparent 58%); pointer-events: none; }
-    .playpause:active { transform: scale(.88); box-shadow: 0 4px 18px rgba(201,168,76,.3); }
-    .playpause svg { width: 28px; height: 28px; position: relative; z-index: 1; margin-left: 2px; }
+/* ── FULL PLAYER SHEET ── */
+.sheet{position:absolute;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;transform:translateY(100%);transition:transform .55s cubic-bezier(.32,1,.25,1);overflow:hidden}
+.sheet.open{transform:translateY(0)}
+.sheet::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 110% 60% at 50% -5%,rgba(201,168,76,.1),transparent 55%),radial-gradient(ellipse 70% 50% at 100% 100%,rgba(90,60,180,.07),transparent 60%)}
 
-    .vol-row { display: flex; align-items: center; gap: 11px; }
-    .vol-icon { color: var(--t3); display: flex; }
-    .vol-icon svg { width: 14px; height: 14px; }
-    .vol-wrap { flex: 1; position: relative; height: 20px; display: flex; align-items: center; }
-    .vol-track { position: absolute; left: 0; right: 0; height: 3px; border-radius: 2px; background: rgba(255,255,255,.07); overflow: hidden; pointer-events: none; }
-    .vol-fill { height: 100%; width: 80%; background: linear-gradient(to right, #5a3e10, var(--gold)); }
-    .vol-input { position: absolute; left: 0; right: 0; width: 100%; height: 20px; opacity: 0; cursor: pointer; z-index: 3; -webkit-appearance: none; appearance: none; }
+.sh-handle-area{padding:18px 0 0;flex-shrink:0;cursor:pointer;width:100%;display:flex;justify-content:center}
+.sh-handle{width:38px;height:4px;border-radius:2px;background:var(--b2)}
 
-    /* ── RIGHT ── */
-    .right { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
+.sh-close{position:absolute;top:18px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:color .2s,background .2s}
+.sh-close:hover{color:var(--txt);background:rgba(255,255,255,.14)}
+.sh-close svg{width:18px;height:18px}
 
-    .rhead { padding: 36px 40px 24px; border-bottom: 1px solid var(--b1); flex-shrink: 0; }
-    .rhead-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
-    .rhead-eyebrow { font-size: 9px; letter-spacing: .28em; text-transform: uppercase; color: var(--t3); font-weight: 600; margin-bottom: 4px; }
-    .rhead-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; font-weight: 300; color: var(--text); }
-    .rhead-count { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--t2); font-weight: 600; }
-    .tabs { display: inline-flex; border: 1px solid var(--b1); border-radius: 8px; overflow: hidden; }
-    .tab { padding: 6px 18px; background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--t2); cursor: pointer; transition: background .2s, color .2s; }
-    .tab + .tab { border-left: 1px solid var(--b1); }
-    .tab.on { background: rgba(201,168,76,.1); color: var(--gold2); }
+.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:8px 32px 40px;overflow-y:auto;scrollbar-width:none;gap:0}
+.sh-body::-webkit-scrollbar{display:none}
 
-    .panel { display: none; flex: 1; overflow-y: auto; flex-direction: column; }
-    .panel.on { display: flex; }
-    .panel::-webkit-scrollbar { width: 3px; }
-    .panel::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+/* ── VINYL WRAP — tonearm is a SIBLING of the disc, not inside it ── */
+.vin-wrap{
+  position:relative;
+  width:min(68vw,300px);
+  aspect-ratio:1;
+  flex-shrink:0;
+  margin-bottom:32px;
+}
 
-    /* track list — grid layout, bigger rows */
-    .tlist { padding: 12px 28px 20px; }
+.vin-glow{position:absolute;inset:-40px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(201,168,76,.22),rgba(90,60,180,.14),transparent 70%);opacity:0;transition:opacity 1.2s}
+.vin-glow.on{opacity:1;animation:gbreathing 4s ease-in-out infinite}
+@keyframes gbreathing{0%,100%{opacity:.45}50%{opacity:1}}
 
-    .titem {
-      display: grid;
-      grid-template-columns: 32px 56px 1fr auto;
-      align-items: center; gap: 0 16px;
-      padding: 14px 16px; border-radius: 14px; cursor: pointer;
-      border: 1px solid transparent;
-      transition: background .18s, border-color .18s, transform .15s;
-      position: relative;
-    }
-    .titem:not(:last-child)::after { content: ''; position: absolute; bottom: 0; left: 16px; right: 16px; height: 1px; background: var(--b1); }
-    .titem:hover { background: var(--hover); transform: translateX(4px); }
-    .titem:hover::after { display: none; }
-    .titem.now { background: rgba(201,168,76,.055); border-color: rgba(201,168,76,.2); transform: translateX(4px); }
-    .titem.now::after { display: none; }
+/* The disc — fills the wrap, spins alone */
+.vin-disc{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  will-change:transform;
+  background:
+    radial-gradient(circle,#1e1e2a 0%,#1e1e2a 15%,transparent 15.5%),
+    conic-gradient(from 0deg,
+      #0d0d18 0deg 4deg,#141420 4deg 8deg,#0d0d18 8deg 12deg,#141420 12deg 16deg,
+      #0d0d18 16deg 20deg,#141420 20deg 24deg,#0d0d18 24deg 28deg,#141420 28deg 32deg,
+      #0d0d18 32deg 36deg,#141420 36deg 40deg,#0d0d18 40deg 44deg,#141420 44deg 48deg,
+      #0d0d18 48deg 52deg,#141420 52deg 360deg);
+  box-shadow:0 0 0 1px rgba(255,255,255,.04),0 0 0 3px rgba(0,0,0,.8),inset 0 0 60px rgba(0,0,0,.5),0 30px 80px rgba(0,0,0,.85);
+  transition:filter .8s;
+}
+.vin-disc::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 55% 35% at 26% 18%,rgba(255,255,255,.09),transparent 55%);z-index:1;pointer-events:none}
+.vin-disc.spin{animation:vinSpin 7s linear infinite}
+@keyframes vinSpin{to{transform:rotate(360deg)}}
+.vin-disc.dim{filter:brightness(.32) saturate(.4)}
 
-    .tnum-cell { text-align: center; }
-    .tnum { font-size: 11px; color: var(--t3); font-variant-numeric: tabular-nums; }
-    .titem.now .tnum { display: none; }
-    .now-bars { display: none; align-items: flex-end; justify-content: center; gap: 2px; height: 14px; }
-    .titem.now .now-bars { display: flex; }
-    .nb { width: 3px; border-radius: 1.5px; background: var(--gold2); animation: nb var(--nd) ease-in-out infinite alternate; }
-    @keyframes nb { from{height:3px} to{height:var(--nh)} }
+.vin-lbl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:27%;aspect-ratio:1;border-radius:50%;background:conic-gradient(from 135deg,#3a2005,var(--gold),var(--gold2),var(--gold3),var(--gold),#3a2005);display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 18px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.1)}
+.vin-lbl svg{width:42%;height:42%;opacity:.9}
 
-    .tthumb { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, #14141e, #0e0e18); border: 1px solid var(--b1); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; transition: border-color .2s, box-shadow .2s, transform .2s; }
-    .titem:hover .tthumb { transform: scale(1.06); }
-    .titem.now .tthumb { border-color: rgba(201,168,76,.35); box-shadow: 0 0 20px rgba(201,168,76,.15); }
+/*
+  FIX 1: Tonearm is absolutely positioned WITHIN .vin-wrap (not inside .vin-disc)
+  It never rotates with the record. Transform-origin is its pivot point (top-right dot).
+*/
+.tonearm{
+  position:absolute;
+  top:2%;
+  right:-8%;
+  width:38%;
+  transform-origin:83% 10%;
+  transform:rotate(-30deg);
+  transition:transform 1.3s cubic-bezier(.25,.46,.45,.94);
+  pointer-events:none;
+  z-index:10;
+}
+.tonearm.on{transform:rotate(-5deg)}
 
-    .ttext { min-width: 0; }
-    .ttitle { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); margin-bottom: 4px; transition: color .2s; }
-    .titem.now .ttitle { color: var(--gold2); }
-    .tsub { font-size: 11px; color: var(--t2); }
+.sh-song{width:100%;text-align:center;margin-bottom:24px}
+.sh-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.15;margin-bottom:10px}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sh-title.anim{animation:tin .38s cubic-bezier(.34,1.2,.64,1) forwards}
+.sh-lang{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.32);padding:3px 10px;border-radius:3px;background:rgba(201,168,76,.08);display:inline-block;margin-right:8px}
+.sh-type{font-size:11px;color:var(--t2)}
 
-    .tdur { font-size: 11px; color: var(--t3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sh-viz{width:100%;height:40px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.018);margin-bottom:20px;flex-shrink:0}
+#viz{width:100%;height:100%;display:block}
 
-    /* queue */
-    .qwrap { padding: 12px 28px 20px; display: flex; flex-direction: column; gap: 5px; }
-    .qitem { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--b1); cursor: grab; transition: opacity .15s, transform .15s, border-color .18s; }
-    .qitem:active { cursor: grabbing; }
-    .qitem.dragging { opacity: .3; transform: scale(.95); }
-    .qitem.dragover { border-color: rgba(201,168,76,.45); background: rgba(201,168,76,.06); }
-    .qhandle { display: flex; flex-direction: column; gap: 3.5px; color: var(--t3); cursor: grab; padding: 2px; flex-shrink: 0; }
-    .qhandle span { display: block; width: 14px; height: 1.5px; background: currentColor; border-radius: 1px; }
-    .qpos { width: 22px; text-align: center; font-size: 11px; color: var(--t2); flex-shrink: 0; }
-    .qinfo { flex: 1; min-width: 0; }
-    .qtitle { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .qsub { font-size: 11px; color: var(--t2); margin-top: 2px; }
-    .qdur { font-size: 11px; color: var(--t3); flex-shrink: 0; font-variant-numeric: tabular-nums; }
-    .qnow { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--gold2); flex-shrink: 0; }
+.sh-prog{width:100%;margin-bottom:22px}
+.prow{position:relative;height:26px;display:flex;align-items:center;cursor:pointer;margin-bottom:7px}
+.ptrack{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.08);pointer-events:none;overflow:hidden}
+.pfill{height:100%;width:0%;border-radius:2px;background:linear-gradient(to right,var(--gold),var(--gold2));pointer-events:none}
+.pthumb{position:absolute;left:0%;width:16px;height:16px;border-radius:50%;background:#fff;transform:translateX(-50%);box-shadow:0 0 0 3px rgba(232,204,122,.35),0 0 20px rgba(232,204,122,.5);pointer-events:none;z-index:2;transition:transform .1s}
+.prow:hover .pthumb{transform:translateX(-50%) scale(1.25)}
+.pinput{position:absolute;left:0;right:0;width:100%;height:26px;opacity:0;cursor:pointer;z-index:3}
+.trow{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:.04em}
 
-    .back { display: flex; align-items: center; gap: 8px; padding: 20px 40px; color: var(--t3); font-size: 10px; text-decoration: none; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; transition: color .2s; flex-shrink: 0; }
-    .back:hover { color: var(--gold2); }
-    .back svg { width: 12px; height: 12px; }
+.sh-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:22px;width:100%}
+.ctr{background:none;border:none;color:var(--t2);cursor:pointer;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,transform .12s}
+.ctr:hover{color:var(--txt);background:rgba(255,255,255,.06)}
+.ctr:active{transform:scale(.82)}
+.ctr.on{color:var(--gold2)}
+.ctr svg{width:19px;height:19px}
+.cskip{width:50px;height:50px;background:rgba(255,255,255,.06);border:1px solid var(--b1);border-radius:50%;color:var(--txt)}
+.cskip:hover{background:rgba(255,255,255,.1)}
+.cskip svg{width:22px;height:22px}
+.cplay{width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;background:conic-gradient(from 135deg,var(--gold),var(--gold2),var(--gold3),var(--gold2),var(--gold));color:#06060e;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(232,204,122,.25),0 10px 44px rgba(201,168,76,.55);transition:transform .15s,box-shadow .2s}
+.cplay::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 65% 45% at 32% 22%,rgba(255,255,255,.28),transparent 55%);pointer-events:none}
+.cplay:hover{transform:scale(1.05);box-shadow:0 0 0 1px rgba(232,204,122,.35),0 14px 54px rgba(201,168,76,.7)}
+.cplay:active{transform:scale(.9)}
+.cplay svg{width:30px;height:30px;position:relative;z-index:1;margin-left:3px}
 
-    /* mini bar */
-    .mini { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 72px; background: rgba(7,7,15,.97); backdrop-filter: blur(30px); border-top: 1px solid var(--b2); align-items: center; padding: 0 16px; gap: 12px; z-index: 500; }
-    .mini-disc { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; background: repeating-conic-gradient(#0f0f18 0deg 4deg, #17171f 4deg 8deg); border: 2px solid rgba(201,168,76,.3); display: flex; align-items: center; justify-content: center; font-size: .95rem; will-change: transform; }
-    .mini-disc.playing { animation: spin 7s linear infinite; }
-    .mini-info { flex: 1; min-width: 0; }
-    .mini-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mini-sub { font-size: 10px; color: var(--t2); margin-top: 2px; }
-    .mini-btns { display: flex; align-items: center; gap: 4px; }
-    .mini-btn { background: none; border: none; color: var(--t2); cursor: pointer; padding: 6px; display: flex; align-items: center; }
-    .mini-btn svg { width: 22px; height: 22px; }
-    .mini-play { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--gold2), var(--gold)); border: none; color: #06060e; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .mini-play svg { width: 17px; height: 17px; margin-left: 1px; }
-    .mini-prog { position: absolute; bottom: 0; left: 0; height: 2px; background: linear-gradient(to right, #5a3e10, var(--gold2)); border-radius: 0 1px 1px 0; }
+.sh-vol{display:flex;align-items:center;gap:12px;width:100%}
+.vico{color:var(--t3);display:flex;flex-shrink:0}
+.vico svg{width:14px;height:14px}
+.vwrap{flex:1;position:relative;height:22px;display:flex;align-items:center}
+.vtrack{position:absolute;left:0;right:0;height:3px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;pointer-events:none}
+.vfill{height:100%;width:80%;background:linear-gradient(to right,var(--gold),var(--gold2))}
+.vinput{position:absolute;left:0;right:0;width:100%;height:22px;opacity:0;cursor:pointer;z-index:3}
 
-    @media (max-width: 720px) {
-      .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow: hidden; }
-      .left { width: 100%; border-right: none; border-bottom: 1px solid var(--b1); max-height: 52dvh; }
-      .lscroll { padding: 18px 20px 14px; }
-      .brand { margin-bottom: 14px; }
-      .brand-name { font-size: 1.6rem; }
-      .track-title { font-size: 1.5rem; }
-      .viz-wrap { height: 28px; margin-bottom: 14px; }
-      .controls { margin-bottom: 14px; gap: 8px; }
-      .playpause { width: 58px; height: 58px; }
-      .playpause svg { width: 24px; height: 24px; }
-      .skip { width: 42px; height: 42px; }
-      .vol-row { display: none; }
-      .right { padding-bottom: 72px; }
-      .rhead { padding: 16px 18px 14px; }
-      .rhead-title { font-size: 1.5rem; }
-      .tlist { padding: 8px 12px 16px; }
-      .titem { grid-template-columns: 28px 46px 1fr auto; }
-      .tthumb { width: 46px; height: 46px; }
-      .qwrap { padding: 8px 12px 16px; }
-      .back { padding: 16px 20px; }
-      .mini { display: flex; }
-    }
-  </style>
+/* queue open button */
+.queue-btn{display:flex;align-items:center;gap:10px;margin-top:18px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:12px;padding:12px 16px;cursor:pointer;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;transition:background .18s,border-color .18s,color .18s}
+.queue-btn:hover{background:rgba(255,255,255,.07);border-color:var(--b2);color:var(--txt)}
+.queue-btn svg{width:15px;height:15px;flex-shrink:0}
+.qb-label{flex:1;text-align:left;letter-spacing:.04em}
+.qb-count{font-size:10px;background:rgba(201,168,76,.15);color:var(--gold2);border-radius:20px;padding:2px 8px;border:1px solid rgba(201,168,76,.2)}
+
+/* ── QUEUE SCREEN ── */
+.qscreen{position:absolute;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .4s cubic-bezier(.32,1,.25,1);overflow:hidden}
+.qscreen.open{transform:translateX(0)}
+.qscreen::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(201,168,76,.06),transparent 60%)}
+
+.qscreen-head{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:52px 20px 16px;border-bottom:1px solid var(--b1);position:relative;z-index:1}
+.qscreen-back{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);border:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;flex-shrink:0}
+.qscreen-back:hover{color:var(--txt);background:rgba(255,255,255,.12)}
+.qscreen-back svg{width:18px;height:18px}
+.qscreen-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;font-weight:300;color:var(--txt);flex:1}
+.qscreen-count{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);font-weight:600}
+
+/* Add songs section at top of queue */
+.q-add-section{padding:14px 16px 6px;border-bottom:1px solid var(--b1);flex-shrink:0;position:relative;z-index:1}
+.q-add-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);font-weight:700;margin-bottom:10px}
+.q-add-list{display:flex;flex-direction:column;gap:3px}
+.q-add-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s}
+.q-add-row:hover{background:var(--hover);border-color:var(--b1)}
+.q-add-row.already-queued{opacity:.4;cursor:default;pointer-events:none}
+.q-add-art{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--b1);position:relative;overflow:hidden}
+.q-add-art::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none}
+.q-add-art svg{position:relative;z-index:1}
+.q-add-info{flex:1;min-width:0}
+.q-add-title{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.q-add-sub{font-size:10px;color:var(--t2);margin-top:1px}
+.q-add-btn{width:26px;height:26px;border-radius:50%;border:none;background:rgba(201,168,76,.12);color:var(--gold2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,transform .12s}
+.q-add-btn:hover{background:rgba(201,168,76,.25);transform:scale(1.1)}
+.q-add-btn:active{transform:scale(.9)}
+.q-add-btn svg{width:14px;height:14px}
+.already-badge{font-size:9px;color:var(--gold);background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:2px 7px;flex-shrink:0;white-space:nowrap}
+
+.qscreen-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 16px 32px;scrollbar-width:thin;scrollbar-color:var(--b2) transparent;position:relative;z-index:1}
+.qscreen-body::-webkit-scrollbar{width:3px}
+.qscreen-body::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+.qscreen-now{padding:12px 14px 6px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);font-weight:700}
+.qscreen-next{padding:12px 14px 4px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.qscreen-next span{font-size:9px;color:var(--t3);letter-spacing:.04em;text-transform:none;font-weight:400;font-style:italic}
+
+.q-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s;margin-bottom:2px}
+.q-row:hover{background:var(--hover);border-color:var(--b1)}
+.q-row.q-now{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(100,70,200,.05));border-color:rgba(201,168,76,.2)}
+
+/* drag handle */
+.q-handle{display:flex;flex-direction:column;gap:3px;color:var(--t3);cursor:grab;padding:2px 4px;flex-shrink:0;opacity:0;transition:opacity .15s}
+.q-row:hover .q-handle{opacity:1}
+.q-handle:active{cursor:grabbing}
+.q-handle span{display:block;width:14px;height:1.5px;background:currentColor;border-radius:1px}
+
+/* drag states */
+.q-row.dragging{opacity:.35;transform:scale(.97)}
+.q-row.drag-over-top{border-top:2px solid var(--gold2) !important}
+.q-row.drag-over-bottom{border-bottom:2px solid var(--gold2) !important}
+
+.q-art{width:42px;height:42px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--b1);position:relative;overflow:hidden}
+.q-art::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none}
+.q-art svg{position:relative;z-index:1}
+.q-info{flex:1;min-width:0}
+.q-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.q-row.q-now .q-title{color:var(--gold2)}
+.q-sub{font-size:10px;color:var(--t2);margin-top:2px}
+.q-dur{font-size:10px;color:var(--t3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+.q-remove{width:26px;height:26px;border-radius:50%;border:none;background:none;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,color .15s,background .15s;flex-shrink:0}
+.q-row:hover .q-remove{opacity:1}
+.q-remove:hover{color:var(--txt);background:rgba(255,255,255,.1)}
+.q-remove svg{width:13px;height:13px}
+.q-empty{text-align:center;padding:30px 20px;font-size:13px;color:var(--t3);font-style:italic}
+
+@media(max-width:500px){
+  .hdr{padding:40px 18px 18px}
+  .plist{padding:0 6px 6px}
+  .track{padding:10px;border-radius:13px;gap:10px}
+  .t-art{width:46px;height:46px;border-radius:11px}
+  .t-title{font-size:13px}
+  .bar{padding:0 14px}
+  .sh-body{padding:8px 22px 16px}
+  .vin-wrap{width:min(74vw,260px);margin-bottom:22px}
+  .sh-song{margin-bottom:18px}
+  .cplay{width:64px;height:64px}
+  .cskip{width:44px;height:44px}
+}
+@media(min-width:700px){
+  .hdr{padding:60px 48px 28px}
+  .plist{padding:0 36px 8px}
+  .bar{padding:0 36px}
+  .sh-body{padding:8px 48px 24px}
+  .vin-wrap{width:min(60vw,320px);margin-bottom:36px}
+}
+</style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-  <div class="left">
-    <div class="lscroll">
-      <div class="brand">
-        <div class="brand-eye">Personal Collection</div>
-        <div class="brand-name">Songs By Me</div>
-        <div class="brand-sub">6 covers &middot; Sung with love</div>
-      </div>
+  <div class="page" id="page">
+    <div class="hdr">
+      <div class="hdr-eye">Personal Collection</div>
+      <div class="hdr-name">Songs By Me</div>
+      <div class="hdr-sub">6 covers · Sung with love</div>
+    </div>
+    <div class="plist" id="plist"></div>
+  </div>
 
-      <div class="art-wrap">
-        <div class="art-glow" id="art-glow"></div>
-        <div class="artwork">
-          <div class="arm" id="arm">
-            <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
-              <circle cx="74" cy="10" r="8" fill="rgba(201,168,76,.1)" stroke="rgba(201,168,76,.5)" stroke-width="1.5"/>
-              <circle cx="74" cy="10" r="3.5" fill="#c9a84c"/>
-              <line x1="74" y1="18" x2="20" y2="74" stroke="rgba(201,168,76,.5)" stroke-width="2" stroke-linecap="round"/>
-              <ellipse cx="20" cy="74" rx="6" ry="4" fill="rgba(201,168,76,.15)" stroke="rgba(201,168,76,.5)" stroke-width="1"/>
+  <div class="bar ghost" id="bar">
+    <div class="bar-prog" id="bprog" style="width:0%"></div>
+    <div class="bar-disc" id="bdisc">
+      <svg id="bdisc-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#e8cc7a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+      </svg>
+    </div>
+    <div class="bar-info">
+      <div class="bar-title" id="btitle">—</div>
+      <div class="bar-sub" id="bsub">Tap to open player</div>
+    </div>
+    <button class="bar-btn" id="bprev" onclick="event.stopPropagation()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 20L9 12l10-8v16z"/><rect x="5" y="4" width="2.5" height="16" rx="1"/></svg>
+    </button>
+    <button class="bar-playbtn" id="bplay" onclick="event.stopPropagation()">
+      <svg id="bplay-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="bar-btn" id="bnext" onclick="event.stopPropagation()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4l10 8-10 8V4z"/><rect x="16.5" y="4" width="2.5" height="16" rx="1"/></svg>
+    </button>
+    <button class="bar-up" id="bup" onclick="event.stopPropagation()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+  </div>
+
+  <!-- PLAYER SHEET -->
+  <div class="sheet" id="sheet">
+    <div class="sh-handle-area" id="sh-handle"><div class="sh-handle"></div></div>
+    <button class="sh-close" id="sh-close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+
+    <div class="sh-body">
+      <!-- FIX 1: tonearm is a sibling of vin-disc, both inside vin-wrap -->
+      <div class="vin-wrap">
+        <div class="vin-glow" id="vinglow"></div>
+        <!-- disc spins -->
+        <div class="vin-disc dim" id="vindisc">
+          <div class="vin-lbl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#06060e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
             </svg>
           </div>
-          <div class="vinyl dim" id="vinyl">
-            <div class="vinyl-label">🎵</div>
-          </div>
         </div>
+        <!-- tonearm does NOT spin — it's outside the disc -->
+        <svg class="tonearm" id="tonearm" viewBox="0 0 100 100" fill="none">
+          <circle cx="82" cy="10" r="9" fill="rgba(201,168,76,.1)" stroke="rgba(201,168,76,.5)" stroke-width="1.5"/>
+          <circle cx="82" cy="10" r="3.5" fill="#c9a84c"/>
+          <line x1="82" y1="18" x2="22" y2="80" stroke="rgba(201,168,76,.45)" stroke-width="2.2" stroke-linecap="round"/>
+          <ellipse cx="22" cy="80" rx="6.5" ry="4" fill="rgba(201,168,76,.12)" stroke="rgba(201,168,76,.45)" stroke-width="1"/>
+        </svg>
       </div>
 
-      <div class="track-info">
-        <div class="track-title" id="np-title">Munbe Vaa</div>
-        <div class="track-tags">
-          <span class="tag-lang" id="np-lang">Tamil</span>
-          <span class="tag-type">Cover</span>
-        </div>
+      <div class="sh-song">
+        <div class="sh-title" id="shtitle">Munbe Vaa</div>
+        <span class="sh-lang" id="shlang">Tamil</span><span class="sh-type">Cover</span>
       </div>
 
-      <div class="viz-wrap"><canvas id="viz"></canvas></div>
+      <div class="sh-viz"><canvas id="viz"></canvas></div>
 
-      <div class="prog-area">
-        <div class="prog-row">
-          <div class="prog-track"><div class="prog-fill" id="pfill"></div></div>
-          <div class="prog-thumb" id="pthumb"></div>
-          <input type="range" class="prog-input" id="prog" value="0" min="0" max="100" step="0.1">
+      <div class="sh-prog">
+        <div class="prow">
+          <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+          <div class="pthumb" id="pthumb"></div>
+          <input type="range" class="pinput" id="prog" value="0" min="0" max="100" step="0.1">
         </div>
-        <div class="time-row"><span id="cur">0:00</span><span id="dur">--:--</span></div>
+        <div class="trow"><span id="cur">0:00</span><span id="dur">--:--</span></div>
       </div>
 
-      <div class="controls">
-        <button class="ctrl" id="btn-shuffle" title="Shuffle">
+      <div class="sh-ctrl">
+        <button class="ctr" id="btn-shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
         </button>
-        <button class="ctrl skip" id="btn-prev">
+        <button class="ctr cskip" id="btn-prev">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 20L9 12l10-8v16z"/><rect x="5" y="4" width="2.5" height="16" rx="1"/></svg>
         </button>
-        <button class="playpause" id="btn-play">
+        <button class="cplay" id="btn-play">
           <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </button>
-        <button class="ctrl skip" id="btn-next">
+        <button class="ctr cskip" id="btn-next">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4l10 8-10 8V4z"/><rect x="16.5" y="4" width="2.5" height="16" rx="1"/></svg>
         </button>
-        <button class="ctrl" id="btn-repeat" title="Repeat">
+        <button class="ctr" id="btn-repeat">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
         </button>
       </div>
 
-      <div class="vol-row">
-        <span class="vol-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg></span>
-        <div class="vol-wrap">
-          <div class="vol-track"><div class="vol-fill" id="vfill"></div></div>
-          <input type="range" class="vol-input" id="vol" value="80" min="0" max="100">
+      <div class="sh-vol">
+        <span class="vico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg></span>
+        <div class="vwrap">
+          <div class="vtrack"><div class="vfill" id="vfill"></div></div>
+          <input type="range" class="vinput" id="vol" value="80" min="0" max="100">
         </div>
-        <span class="vol-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span>
+        <span class="vico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span>
       </div>
+
+      <button class="queue-btn" id="queue-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span class="qb-label">Up next</span>
+        <span id="qb-count" class="qb-count">0</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </div>
 
-  <div class="right">
-    <div class="rhead">
-      <div class="rhead-top">
-        <div>
-          <div class="rhead-eyebrow">Your Recordings</div>
-          <div class="rhead-title">The Collection</div>
-        </div>
-        <div class="rhead-count">6 tracks</div>
-      </div>
-      <div class="tabs">
-        <button class="tab on" data-panel="playlist">Playlist</button>
-        <button class="tab" data-panel="queue">Queue</button>
-      </div>
+  <!-- QUEUE SCREEN -->
+  <div class="qscreen" id="qscreen">
+    <div class="qscreen-head">
+      <button class="qscreen-back" id="qscreen-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="qscreen-title">Queue</div>
+      <div class="qscreen-count" id="qscreen-count">0 songs</div>
     </div>
 
-    <div class="panel on" id="panel-playlist">
-      <div class="tlist" id="tlist"></div>
-      <a href="/memory" class="back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Back to Home
-      </a>
+    <!-- Add songs section -->
+    <div class="q-add-section" id="q-add-section">
+      <div class="q-add-label">Add to queue</div>
+      <div class="q-add-list" id="q-add-list"></div>
     </div>
-    <div class="panel" id="panel-queue">
-      <div class="qwrap" id="qlist"></div>
-    </div>
-  </div>
 
-</div>
-
-<div class="mini" id="mini">
-  <div class="mini-disc" id="mini-disc">🎵</div>
-  <div class="mini-info">
-    <div class="mini-title" id="mini-title">Munbe Vaa</div>
-    <div class="mini-sub" id="mini-sub">Tamil · Cover</div>
+    <!-- Reorderable queue -->
+    <div class="qscreen-body" id="qscreen-body"></div>
   </div>
-  <div class="mini-btns">
-    <button class="mini-btn" id="mini-prev"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 20L9 12l10-8v16z"/><rect x="5" y="4" width="2.5" height="16" rx="1"/></svg></button>
-    <button class="mini-play" id="mini-play"><svg id="mini-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-    <button class="mini-btn" id="mini-next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4l10 8-10 8V4z"/><rect x="16.5" y="4" width="2.5" height="16" rx="1"/></svg></button>
-  </div>
-  <div class="mini-prog" id="mini-prog" style="width:0%"></div>
 </div>
 
 <audio id="audio"></audio>
 
 <script>
 (function(){
-  const SONGS = [
-    { src:"{{ url_for('static',filename='audio/song1.mp3') }}", title:"Munbe Vaa",              lang:"Tamil"     },
-    { src:"{{ url_for('static',filename='audio/song2.mp3') }}", title:"Ninakai Njan Paattu",    lang:"Malayalam" },
-    { src:"{{ url_for('static',filename='audio/song3.mp3') }}", title:"Mozhikalum Mounangalum", lang:"Malayalam" },
-    { src:"{{ url_for('static',filename='audio/song4.mp3') }}", title:"Oru Venal Puzhayil",     lang:"Malayalam" },
-    { src:"{{ url_for('static',filename='audio/song5.mp3') }}", title:"Kya Hua Tera Wada",      lang:"Hindi"     },
-    { src:"{{ url_for('static',filename='audio/song6.mp3') }}", title:"Parayathe Ariyathe",     lang:"Malayalam" },
-  ];
-  const EMOJIS = ['🎵','🎶','🎼','🎤','🎸','🎹'];
-  const durations = new Array(SONGS.length).fill(null);
-  let queue = SONGS.map((_,i)=>i), origQueue = SONGS.map((_,i)=>i);
-  let qpos = 0, playing = false, shuffle = false, repeat = false;
+const SONGS=[
+  {src:"{{ url_for('static',filename='audio/song1.mp3') }}",title:"Munbe Vaa",              lang:"Tamil",    color:"#3d1f5e",accent:"#b48be0"},
+  {src:"{{ url_for('static',filename='audio/song2.mp3') }}",title:"Ninakai Njan Paattu",    lang:"Malayalam",color:"#0e2d1e",accent:"#5dbf8a"},
+  {src:"{{ url_for('static',filename='audio/song3.mp3') }}",title:"Mozhikalum Mounangalum",lang:"Malayalam",color:"#1a1533",accent:"#9b87d4"},
+  {src:"{{ url_for('static',filename='audio/song4.mp3') }}",title:"Oru Venal Puzhayil",    lang:"Malayalam",color:"#0d2333",accent:"#5aaed6"},
+  {src:"{{ url_for('static',filename='audio/song5.mp3') }}",title:"Kya Hua Tera Wada",     lang:"Hindi",    color:"#2e1b0e",accent:"#d4944a"},
+  {src:"{{ url_for('static',filename='audio/song6.mp3') }}",title:"Parayathe Ariyathe",    lang:"Malayalam",color:"#1e2e18",accent:"#86c46a"},
+];
 
-  const audio=document.getElementById('audio'), vinyl=document.getElementById('vinyl'),
-    arm=document.getElementById('arm'), artGlow=document.getElementById('art-glow'),
-    miniDisc=document.getElementById('mini-disc'), npTitle=document.getElementById('np-title'),
-    npLang=document.getElementById('np-lang'), miniTitle=document.getElementById('mini-title'),
-    miniSub=document.getElementById('mini-sub'), playIcon=document.getElementById('play-icon'),
-    miniIcon=document.getElementById('mini-icon'), pfill=document.getElementById('pfill'),
-    pthumb=document.getElementById('pthumb'), prog=document.getElementById('prog'),
-    curEl=document.getElementById('cur'), durEl=document.getElementById('dur'),
-    miniProg=document.getElementById('mini-prog'), vfill=document.getElementById('vfill');
+function noteIcon(stroke,size){return`<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${stroke}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`}
 
-  const cvs=document.getElementById('viz'), ctx=cvs.getContext('2d'), N=46;
-  const h=new Float32Array(N).fill(.05), tgt=new Float32Array(N).map(()=>Math.random()*.3+.05), spd=new Float32Array(N).map(()=>.03+Math.random()*.05);
-  let vizOn=false;
-  function sizeCanvas(){const r=cvs.parentElement.getBoundingClientRect(),d=devicePixelRatio||1;cvs.width=Math.round(r.width*d);cvs.height=Math.round(r.height*d);}
-  sizeCanvas(); new ResizeObserver(sizeCanvas).observe(cvs.parentElement);
-  (function drawViz(){
-    const W=cvs.width,H=cvs.height; ctx.clearRect(0,0,W,H);
-    const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#f5e0a0'); g.addColorStop(.5,'#e8cc7a'); g.addColorStop(1,'#5a3e10'); ctx.fillStyle=g;
-    const slot=W/N,gap=Math.max(1,slot*.28),bw=slot-gap;
-    for(let i=0;i<N;i++){
-      if(vizOn){h[i]+=(tgt[i]-h[i])*spd[i];if(Math.abs(h[i]-tgt[i])<.008){tgt[i]=Math.random()*.9+.07;spd[i]=.02+Math.random()*.06;}}
-      else{h[i]+=(0.04-h[i])*.09;}
-      const bh=Math.max(2,h[i]*H),x=i*slot+gap/2,y=H-bh;
-      ctx.beginPath();ctx.roundRect(x,y,bw,bh,2);ctx.fill();
+let queue=SONGS.map((_,i)=>i), origQ=SONGS.map((_,i)=>i);
+let qpos=0,playing=false,shuffle=false,repeat=false,loaded=false;
+const durs=Array(SONGS.length).fill(null);
+
+const audio=document.getElementById('audio');
+const bar=document.getElementById('bar'),bprog=document.getElementById('bprog');
+const bdisc=document.getElementById('bdisc'),btitle=document.getElementById('btitle');
+const bsub=document.getElementById('bsub'),bplayIcon=document.getElementById('bplay-icon');
+const sheet=document.getElementById('sheet'),vindisc=document.getElementById('vindisc');
+const vinglow=document.getElementById('vinglow'),tonearm=document.getElementById('tonearm');
+const shtitle=document.getElementById('shtitle'),shlang=document.getElementById('shlang');
+const pfill=document.getElementById('pfill'),pthumb=document.getElementById('pthumb');
+const prog=document.getElementById('prog'),curEl=document.getElementById('cur'),durEl=document.getElementById('dur');
+const playIcon=document.getElementById('play-icon'),vfill=document.getElementById('vfill');
+const bdiscIcon=document.getElementById('bdisc-icon');
+const queueBtn=document.getElementById('queue-btn');
+const qbCount=document.getElementById('qb-count');
+const qscreen=document.getElementById('qscreen');
+const qscreenBody=document.getElementById('qscreen-body');
+const qscreenCount=document.getElementById('qscreen-count');
+const qAddList=document.getElementById('q-add-list');
+
+/* ── VISUALIZER ── */
+const cvs=document.getElementById('viz'),c2=cvs.getContext('2d'),N=52;
+const hh=new Float32Array(N).fill(.04);
+const tt=new Float32Array(N).map(()=>Math.random()*.3+.05);
+const ss=new Float32Array(N).map(()=>.02+Math.random()*.05);
+let vizOn=false,cachedGrad=null,cachedGradH=0;
+
+function szC(){const r=cvs.parentElement.getBoundingClientRect(),d=devicePixelRatio||1;cvs.width=Math.round(r.width*d);cvs.height=Math.round(r.height*d);cachedGrad=null}
+szC();new ResizeObserver(szC).observe(cvs.parentElement);
+
+(function draw(){
+  const W=cvs.width,H=cvs.height;c2.clearRect(0,0,W,H);
+  if(!cachedGrad||cachedGradH!==H){cachedGrad=c2.createLinearGradient(0,0,0,H);cachedGrad.addColorStop(0,'rgba(245,224,160,.92)');cachedGrad.addColorStop(.45,'rgba(201,168,76,.6)');cachedGrad.addColorStop(1,'rgba(60,40,10,.08)');cachedGradH=H}
+  c2.fillStyle=cachedGrad;
+  const slot=W/N,gap=Math.max(1,slot*.3),bw=slot-gap;
+  for(let i=0;i<N;i++){
+    if(vizOn){hh[i]+=(tt[i]-hh[i])*ss[i];if(Math.abs(hh[i]-tt[i])<.006){tt[i]=Math.random()*.88+.06;ss[i]=.018+Math.random()*.052}}
+    else{hh[i]+=(0.03-hh[i])*.07}
+    const bh=Math.max(2,hh[i]*H),x=i*slot+gap/2,y=H-bh;
+    c2.beginPath();c2.roundRect(x,y,bw,bh,2);c2.fill();
+  }
+  requestAnimationFrame(draw);
+})();
+
+const PL='M8 5v14l11-7z',PA='M6 19h4V5H6v14zm8-14v14h4V5h-4z';
+function fmt(s){if(!s||isNaN(s))return'--:--';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`}
+
+function setPlaying(on){
+  playing=on;vizOn=on;
+  vindisc.classList.toggle('spin',on);
+  vindisc.classList.toggle('dim',!on);
+  vinglow.classList.toggle('on',on);
+  tonearm.classList.toggle('on',on);
+  bdisc.classList.toggle('spin',on);
+  const d=on?PA:PL;
+  playIcon.querySelector('path').setAttribute('d',d);
+  bplayIcon.querySelector('path').setAttribute('d',d);
+}
+
+function setProgress(p){pfill.style.width=p+'%';pthumb.style.left=p+'%';bprog.style.width=p+'%';prog.value=p}
+
+function loadSong(idx){
+  const s=SONGS[queue[idx]];
+  audio.src=s.src;audio.load();
+  shtitle.classList.remove('anim');void shtitle.offsetWidth;shtitle.textContent=s.title;shtitle.classList.add('anim');
+  shlang.textContent=s.lang;
+  btitle.textContent=s.title;bsub.textContent=s.lang+' · Cover';
+  bdiscIcon.setAttribute('stroke',s.accent);
+  setProgress(0);curEl.textContent='0:00';durEl.textContent='--:--';
+}
+
+function playIdx(idx){
+  qpos=idx;loaded=true;loadSong(qpos);
+  audio.play().then(()=>setPlaying(true)).catch(()=>{});
+  bar.classList.remove('ghost');
+  renderList();renderQueue();
+}
+
+function togglePlay(){
+  if(!loaded){playIdx(0);return}
+  if(playing){audio.pause();setPlaying(false)}
+  else{audio.play().then(()=>setPlaying(true)).catch(()=>{})}
+}
+function next(){qpos=(qpos+1)%queue.length;playIdx(qpos)}
+function prev(){if(audio.currentTime>3){audio.currentTime=0;return}qpos=(qpos-1+queue.length)%queue.length;playIdx(qpos)}
+
+function openSheet(){sheet.classList.add('open')}
+function closeSheet(){sheet.classList.remove('open');sheet.style.transform=''}
+function openQueue(){renderQueue();qscreen.classList.add('open')}
+function closeQueue(){qscreen.classList.remove('open')}
+
+bar.addEventListener('click',openSheet);
+document.getElementById('bup').addEventListener('click',e=>{e.stopPropagation();openSheet()});
+document.getElementById('sh-close').addEventListener('click',closeSheet);
+document.getElementById('sh-handle').addEventListener('click',closeSheet);
+queueBtn.addEventListener('click',openQueue);
+document.getElementById('qscreen-back').addEventListener('click',closeQueue);
+
+/* swipe-to-close sheet */
+let ty0=0,ty=0,swipeActive=false;
+const shHandle=document.getElementById('sh-handle');
+shHandle.addEventListener('touchstart',e=>{swipeActive=true;ty0=e.touches[0].clientY;ty=0},{passive:true});
+document.addEventListener('touchmove',e=>{if(!swipeActive)return;ty=e.touches[0].clientY-ty0;if(ty>0)sheet.style.transform=`translateY(${Math.min(ty,300)}px)`},{passive:true});
+document.addEventListener('touchend',()=>{if(!swipeActive)return;swipeActive=false;if(ty>100)closeSheet();else{sheet.style.transform='';ty=0}},{passive:true});
+sheet.addEventListener('transitionend',()=>{if(!sheet.classList.contains('open'))sheet.style.transform=''});
+
+/* ── RENDER ADD-SONGS SECTION ── */
+function renderAddSection(){
+  const upcomingSet=new Set(queue.slice(qpos+1));
+  const nowSongIdx=queue[qpos];
+  qAddList.innerHTML='';
+  SONGS.forEach((s,i)=>{
+    if(i===nowSongIdx)return; // skip now-playing
+    const alreadyQueued=upcomingSet.has(i);
+    const row=document.createElement('div');
+    row.className='q-add-row'+(alreadyQueued?' already-queued':'');
+    row.innerHTML=`
+      <div class="q-add-art" style="background:${s.color}">${noteIcon(s.accent,16)}</div>
+      <div class="q-add-info">
+        <div class="q-add-title">${s.title}</div>
+        <div class="q-add-sub">${s.lang} · Cover</div>
+      </div>
+      ${alreadyQueued
+        ? '<span class="already-badge">Queued</span>'
+        : `<button class="q-add-btn" data-idx="${i}" title="Add to queue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+           </button>`
+      }`;
+    if(!alreadyQueued){
+      row.querySelector('.q-add-btn').addEventListener('click',e=>{
+        e.stopPropagation();
+        queue.push(parseInt(e.currentTarget.dataset.idx));
+        renderQueue();
+        renderList();
+      });
     }
-    requestAnimationFrame(drawViz);
-  })();
+    qAddList.appendChild(row);
+  });
+}
 
-  const PLAY_D='M8 5v14l11-7z', PAUSE_D='M6 19h4V5H6v14zm8-14v14h4V5h-4z';
-  function setPlaying(on){
-    playing=on;vizOn=on;
-    vinyl.classList.toggle('playing',on); vinyl.classList.toggle('dim',!on);
-    miniDisc.classList.toggle('playing',on); arm.classList.toggle('on',on); artGlow.classList.toggle('on',on);
-    playIcon.querySelector('path').setAttribute('d',on?PAUSE_D:PLAY_D);
-    miniIcon.querySelector('path').setAttribute('d',on?PAUSE_D:PLAY_D);
+/* ── RENDER QUEUE (reorderable) ── */
+let dragSrcQpos=null;
+
+function renderQueue(){
+  const upcoming=queue.slice(qpos+1);
+  const nowSong=SONGS[queue[qpos]];
+  const count=upcoming.length;
+
+  qbCount.textContent=count;
+  qscreenCount.textContent=count+' song'+(count!==1?'s':'')+' up next';
+
+  renderAddSection();
+
+  let html='';
+  if(loaded){
+    html+=`<div class="qscreen-now">Now playing</div>
+    <div class="q-row q-now">
+      <div class="q-art" style="background:${nowSong.color}">${noteIcon(nowSong.accent,18)}</div>
+      <div class="q-info"><div class="q-title">${nowSong.title}</div><div class="q-sub">${nowSong.lang} · Cover</div></div>
+      <span class="q-dur">${fmt(durs[queue[qpos]])}</span>
+    </div>`;
   }
-  function setProgress(p){pfill.style.width=p+'%';pthumb.style.left=p+'%';miniProg.style.width=p+'%';prog.value=p;}
-  function fmt(s){if(!s||isNaN(s))return'--:--';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
-  function animTitle(t){npTitle.classList.remove('anim');void npTitle.offsetWidth;npTitle.textContent=t;npTitle.classList.add('anim');}
 
-  function renderPlaylist(){
-    const cur=queue[qpos],tl=document.getElementById('tlist'); tl.innerHTML='';
-    SONGS.forEach((s,i)=>{
-      const isNow=i===cur,el=document.createElement('div'); el.className='titem'+(isNow?' now':'');
-      el.innerHTML=`<div class="tnum-cell"><span class="tnum">${i+1}</span><div class="now-bars"><div class="nb" style="--nd:.38s;--nh:13px"></div><div class="nb" style="--nd:.55s;--nh:9px"></div><div class="nb" style="--nd:.44s;--nh:14px"></div></div></div><div class="tthumb">${EMOJIS[i]}</div><div class="ttext"><div class="ttitle">${s.title}</div><div class="tsub">${s.lang} · Cover</div></div><span class="tdur">${fmt(durations[i])}</span>`;
-      el.addEventListener('click',()=>{const qi=queue.indexOf(i);if(qi!==-1)qpos=qi;else{queue.splice(qpos+1,0,i);qpos++;}loadAndPlay();});
-      tl.appendChild(el);
+  if(count===0){
+    html+=`<div class="q-empty">Nothing queued — add songs above</div>`;
+  } else {
+    html+=`<div class="qscreen-next">Up next <span>drag to reorder</span></div>`;
+    upcoming.forEach((songIdx,i)=>{
+      const absQpos=qpos+1+i;
+      const s=SONGS[songIdx];
+      html+=`<div class="q-row" data-absqpos="${absQpos}" draggable="true">
+        <div class="q-handle"><span></span><span></span><span></span></div>
+        <div class="q-art" style="background:${s.color}">${noteIcon(s.accent,18)}</div>
+        <div class="q-info"><div class="q-title">${s.title}</div><div class="q-sub">${s.lang} · Cover</div></div>
+        <span class="q-dur">${fmt(durs[songIdx])}</span>
+        <button class="q-remove" data-absqpos="${absQpos}" title="Remove">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
     });
   }
 
-  function renderQueue(){
-    const ql=document.getElementById('qlist'); ql.innerHTML='';
-    queue.forEach((si,qi)=>{
-      const s=SONGS[si],isCur=qi===qpos,el=document.createElement('div'); el.className='qitem';el.draggable=true;el.dataset.qi=qi;
-      if(isCur)el.style.borderColor='rgba(201,168,76,.3)';
-      el.innerHTML=`<div class="qhandle"><span></span><span></span><span></span></div><div class="qpos">${isCur?'▶':qi+1}</div><div class="qinfo"><div class="qtitle">${s.title}</div><div class="qsub">${s.lang} · Cover</div></div><span class="qdur">${fmt(durations[si])}</span>${isCur?'<span class="qnow">Now</span>':''}`;
-      el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',qi);setTimeout(()=>el.classList.add('dragging'),0);});
-      el.addEventListener('dragend',()=>el.classList.remove('dragging'));
-      el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dragover');});
-      el.addEventListener('dragleave',()=>el.classList.remove('dragover'));
-      el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('dragover');const from=+e.dataTransfer.getData('text/plain'),to=+el.dataset.qi;if(from===to)return;const m=queue.splice(from,1)[0];queue.splice(to,0,m);if(from===qpos)qpos=to;else if(from<qpos&&to>=qpos)qpos--;else if(from>qpos&&to<=qpos)qpos++;renderQueue();renderPlaylist();});
-      ql.appendChild(el);
+  qscreenBody.innerHTML=html;
+
+  /* click row to jump to song */
+  qscreenBody.querySelectorAll('.q-row:not(.q-now)').forEach(row=>{
+    row.addEventListener('click',e=>{
+      if(e.target.closest('.q-remove')||e.target.closest('.q-handle'))return;
+      closeQueue();
+      playIdx(parseInt(row.dataset.absqpos));
     });
-  }
+  });
 
-  function loadAndPlay(){
-    const s=SONGS[queue[qpos]]; audio.src=s.src;audio.load();
-    animTitle(s.title); npLang.textContent=s.lang; miniTitle.textContent=s.title; miniSub.textContent=s.lang+' · Cover';
-    setProgress(0);curEl.textContent='0:00';durEl.textContent='--:--';
-    audio.play().then(()=>setPlaying(true)).catch(()=>{});
-    renderPlaylist();renderQueue();
-  }
-  function togglePlay(){if(playing){audio.pause();setPlaying(false);}else{audio.play().then(()=>setPlaying(true)).catch(()=>{});}}
-  function next(){qpos=(qpos+1)%queue.length;loadAndPlay();}
-  function prev(){if(audio.currentTime>3){audio.currentTime=0;return;}qpos=(qpos-1+queue.length)%queue.length;loadAndPlay();}
-  function doShuffle(){const cur=queue[qpos],rest=queue.filter((_,i)=>i!==qpos);for(let i=rest.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[rest[i],rest[j]]=[rest[j],rest[i]];}queue=[cur,...rest];qpos=0;}
-  function undoShuffle(){const cur=queue[qpos];queue=[...origQueue];qpos=queue.indexOf(cur);}
+  /* remove button */
+  qscreenBody.querySelectorAll('.q-remove').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const ap=parseInt(btn.dataset.absqpos);
+      queue.splice(ap,1);
+      renderQueue();renderList();
+    });
+  });
 
-  document.getElementById('btn-play').onclick=togglePlay;
-  document.getElementById('mini-play').onclick=togglePlay;
-  document.getElementById('btn-prev').onclick=prev;
-  document.getElementById('btn-next').onclick=next;
-  document.getElementById('mini-prev').onclick=prev;
-  document.getElementById('mini-next').onclick=next;
-  document.getElementById('btn-shuffle').onclick=()=>{shuffle=!shuffle;document.getElementById('btn-shuffle').classList.toggle('active',shuffle);shuffle?doShuffle():undoShuffle();renderQueue();renderPlaylist();};
-  document.getElementById('btn-repeat').onclick=()=>{repeat=!repeat;document.getElementById('btn-repeat').classList.toggle('active',repeat);};
-  audio.addEventListener('ended',()=>repeat?(audio.currentTime=0,audio.play()):next());
-  audio.addEventListener('timeupdate',()=>{if(!audio.duration)return;const p=(audio.currentTime/audio.duration)*100;setProgress(p);curEl.textContent=fmt(audio.currentTime);durEl.textContent=fmt(audio.duration);});
-  prog.addEventListener('input',()=>{setProgress(+prog.value);if(audio.duration)audio.currentTime=(prog.value/100)*audio.duration;});
-  document.getElementById('vol').addEventListener('input',function(){audio.volume=this.value/100;vfill.style.width=this.value+'%';});
-  audio.volume=0.8;
-  document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById('panel-'+btn.dataset.panel).classList.add('on');});});
+  /* ── DRAG-TO-REORDER (touch + mouse) ── */
+  const rows=[...qscreenBody.querySelectorAll('.q-row:not(.q-now)')];
 
-  let pending=false;
-  SONGS.forEach((s,i)=>{const t=new Audio(s.src);t.addEventListener('loadedmetadata',()=>{durations[i]=t.duration;if(pending)return;pending=true;requestAnimationFrame(()=>{renderPlaylist();renderQueue();pending=false;});});});
+  // ── Mouse drag ──
+  rows.forEach(row=>{
+    row.addEventListener('dragstart',e=>{
+      dragSrcQpos=parseInt(row.dataset.absqpos);
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',dragSrcQpos);
+    });
+    row.addEventListener('dragend',()=>{
+      row.classList.remove('dragging');
+      rows.forEach(r=>r.classList.remove('drag-over-top','drag-over-bottom'));
+    });
+    row.addEventListener('dragover',e=>{
+      e.preventDefault();e.dataTransfer.dropEffect='move';
+      const rect=row.getBoundingClientRect();
+      const midY=rect.top+rect.height/2;
+      rows.forEach(r=>r.classList.remove('drag-over-top','drag-over-bottom'));
+      row.classList.add(e.clientY<midY?'drag-over-top':'drag-over-bottom');
+    });
+    row.addEventListener('dragleave',()=>{
+      row.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    row.addEventListener('drop',e=>{
+      e.preventDefault();
+      const from=dragSrcQpos;
+      const toAbs=parseInt(row.dataset.absqpos);
+      const rect=row.getBoundingClientRect();
+      const midY=rect.top+rect.height/2;
+      const insertBefore=e.clientY<midY;
+      if(from===toAbs)return;
+      const item=queue.splice(from,1)[0];
+      let dest=toAbs;
+      if(from<toAbs)dest--;
+      if(!insertBefore)dest++;
+      dest=Math.max(qpos+1,Math.min(dest,queue.length));
+      queue.splice(dest,0,item);
+      renderQueue();renderList();
+    });
+  });
 
-  renderPlaylist();renderQueue();setProgress(0);
-  audio.src=SONGS[0].src;
+  /* ── Touch drag ── */
+  let touchDragSrc=null,touchClone=null,touchStartY=0;
+
+  rows.forEach(row=>{
+    const handle=row.querySelector('.q-handle');
+    if(!handle)return;
+
+    handle.addEventListener('touchstart',e=>{
+      touchDragSrc=row;
+      touchStartY=e.touches[0].clientY;
+      row.classList.add('dragging');
+      // create floating clone
+      touchClone=row.cloneNode(true);
+      touchClone.style.cssText=`position:fixed;left:${row.getBoundingClientRect().left}px;top:${row.getBoundingClientRect().top}px;width:${row.offsetWidth}px;opacity:.85;z-index:999;pointer-events:none;transform:scale(1.02);box-shadow:0 12px 40px rgba(0,0,0,.6);border-radius:14px;background:var(--surf);`;
+      document.body.appendChild(touchClone);
+    },{passive:true});
+
+    handle.addEventListener('touchmove',e=>{
+      if(!touchDragSrc||!touchClone)return;
+      const dy=e.touches[0].clientY-touchStartY;
+      touchClone.style.transform=`translateY(${dy}px) scale(1.02)`;
+      // highlight target
+      const touchY=e.touches[0].clientY;
+      rows.forEach(r=>{
+        r.classList.remove('drag-over-top','drag-over-bottom');
+        if(r===touchDragSrc)return;
+        const rect=r.getBoundingClientRect();
+        if(touchY>=rect.top&&touchY<=rect.bottom){
+          r.classList.add(touchY<rect.top+rect.height/2?'drag-over-top':'drag-over-bottom');
+        }
+      });
+    },{passive:true});
+
+    handle.addEventListener('touchend',e=>{
+      if(!touchDragSrc)return;
+      if(touchClone){touchClone.remove();touchClone=null}
+      touchDragSrc.classList.remove('dragging');
+      rows.forEach(r=>r.classList.remove('drag-over-top','drag-over-bottom'));
+      const touchY=e.changedTouches[0].clientY;
+      const target=rows.find(r=>{
+        if(r===touchDragSrc)return false;
+        const rect=r.getBoundingClientRect();
+        return touchY>=rect.top&&touchY<=rect.bottom;
+      });
+      if(target){
+        const from=parseInt(touchDragSrc.dataset.absqpos);
+        const toAbs=parseInt(target.dataset.absqpos);
+        const rect=target.getBoundingClientRect();
+        const insertBefore=touchY<rect.top+rect.height/2;
+        if(from!==toAbs){
+          const item=queue.splice(from,1)[0];
+          let dest=toAbs;
+          if(from<toAbs)dest--;
+          if(!insertBefore)dest++;
+          dest=Math.max(qpos+1,Math.min(dest,queue.length));
+          queue.splice(dest,0,item);
+          renderQueue();renderList();
+        }
+      }
+      touchDragSrc=null;
+    },{passive:true});
+  });
+}
+
+/* ── RENDER SONG LIST ── */
+function renderList(){
+  const plist=document.getElementById('plist');
+  plist.innerHTML='';
+  const cur=queue[qpos];
+  SONGS.forEach((s,songIdx)=>{
+    const isNow=loaded&&songIdx===cur;
+    const inQueue=queue.slice(qpos+1).includes(songIdx);
+    const row=document.createElement('div');
+    row.className='track'+(isNow?' now':'');
+    row.innerHTML=`
+      <div class="t-idx">
+        <span class="t-num">${songIdx+1}</span>
+        <div class="eq">
+          <div class="eqb" style="--d:.42s;--s:.93"></div>
+          <div class="eqb" style="--d:.61s;--s:.64"></div>
+          <div class="eqb" style="--d:.38s;--s:1"></div>
+        </div>
+      </div>
+      <div class="t-art" style="background:${s.color}">${noteIcon(isNow?s.accent:'rgba(255,255,255,0.55)',22)}</div>
+      <div class="t-info">
+        <div class="t-title">${s.title}</div>
+        <div class="t-sub">${s.lang} · Cover${inQueue&&!isNow?' · <span style="color:var(--gold);font-size:10px">In queue</span>':''}</div>
+      </div>
+      <span class="t-dur">${fmt(durs[songIdx])}</span>
+      ${isNow?'':`<button class="t-add" data-idx="${songIdx}" title="${inQueue?'Move to next':'Add to queue'}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          ${inQueue
+            ? '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'
+            : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'}
+        </svg>
+      </button>`}`;
+
+    row.addEventListener('click',e=>{
+      if(e.target.closest('.t-add'))return;
+      if(isNow){if(loaded)openSheet();else playIdx(0);return}
+      const qi=queue.indexOf(songIdx,qpos+1);
+      if(qi!==-1)playIdx(qi);
+      else{queue.splice(qpos+1,0,songIdx);playIdx(qpos+1)}
+    });
+
+    const addBtn=row.querySelector('.t-add');
+    if(addBtn){
+      addBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const idx=parseInt(addBtn.dataset.idx);
+        if(!queue.slice(qpos+1).includes(idx)){
+          queue.push(idx);
+        }
+        renderList();renderQueue();
+      });
+    }
+    plist.appendChild(row);
+  });
+}
+
+document.getElementById('btn-play').onclick=togglePlay;
+document.getElementById('bplay').onclick=togglePlay;
+document.getElementById('btn-prev').onclick=prev;
+document.getElementById('btn-next').onclick=next;
+document.getElementById('bprev').onclick=prev;
+document.getElementById('bnext').onclick=next;
+
+document.getElementById('btn-shuffle').onclick=()=>{
+  shuffle=!shuffle;
+  document.getElementById('btn-shuffle').classList.toggle('on',shuffle);
+  if(shuffle){const c=queue[qpos],r=queue.filter((_,i)=>i!==qpos);for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}queue=[c,...r];qpos=0}
+  else{const c=queue[qpos];queue=[...origQ];qpos=queue.indexOf(c)}
+  renderList();renderQueue();
+};
+document.getElementById('btn-repeat').onclick=()=>{repeat=!repeat;document.getElementById('btn-repeat').classList.toggle('on',repeat)};
+
+audio.addEventListener('ended',()=>repeat?(audio.currentTime=0,audio.play()):next());
+audio.addEventListener('timeupdate',()=>{if(!audio.duration)return;const p=(audio.currentTime/audio.duration)*100;setProgress(p);curEl.textContent=fmt(audio.currentTime);durEl.textContent=fmt(audio.duration)});
+prog.addEventListener('input',()=>{setProgress(+prog.value);if(audio.duration)audio.currentTime=(prog.value/100)*audio.duration});
+document.getElementById('vol').addEventListener('input',function(){audio.volume=this.value/100;vfill.style.width=this.value+'%'});
+audio.volume=0.8;
+
+let pending=false;
+SONGS.forEach((s,i)=>{
+  const t=new Audio(s.src);
+  t.addEventListener('loadedmetadata',()=>{durs[i]=t.duration;if(pending)return;pending=true;requestAnimationFrame(()=>{renderList();renderQueue();pending=false})});
+});
+
+renderList();renderQueue();
 })();
 </script>
 </body>
