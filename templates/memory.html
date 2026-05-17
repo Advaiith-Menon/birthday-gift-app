@@ -415,11 +415,11 @@ function spawnRipple(x, y) {
 }
 
 /* ── Navigation ── */
-// Center star → unlock.html
+
 document.getElementById('mainStar').addEventListener('click', e => {
   const rect = document.getElementById('mainStar').getBoundingClientRect();
   spawnRipple(rect.left + rect.width / 2, rect.top + rect.height / 2);
-  setTimeout(() => { window.location.href = '/unlock'; }, 350);
+  setTimeout(() => { window.location.href = '/aadhi'; }, 350);
 });
 
 // Mini stars → memory pages

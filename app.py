@@ -66,9 +66,9 @@ def chat():
     save_memory(memory)
     return jsonify({"reply": bot_reply})
 
-@app.route("/unlock")
+@app.route("/aadhi")
 def unlock():
-    return render_template("unlock.html")
+    return render_template("aadhi.html")
 
 @app.route("/memory")
 def memory():

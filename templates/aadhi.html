@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>For Aadhi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --ink:     #1c1410;
+      --ink2:    #4a3f35;
+      --ink3:    #7a6a5a;
+      --ink4:    #b0a090;
+      --paper:   #f8f3ea;
+      --paper2:  #f2ead8;
+      --paper3:  #e8ddc8;
+      --gold:    #c49a3c;
+      --gold2:   #e8c96e;
+      --rust:    #9e4f2e;
+      --sage:    #5e7a58;
+      --sage2:   #8aab82;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink:   #f2e8d8;
+        --ink2:  #d4c4a8;
+        --ink3:  #9e8e78;
+        --ink4:  #5e5040;
+        --paper:  #1a1410;
+        --paper2: #221c16;
+        --paper3: #2e261e;
+        --gold:  #d4aa50;
+        --gold2: #b88c2c;
+        --rust:  #c4623e;
+        --sage:  #6e9068;
+        --sage2: #4a6444;
+      }
+    }
+
+    body {
+      min-height: 100vh; min-height: 100dvh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Subtle paper texture via repeating CSS ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,0.012) 28px, rgba(0,0,0,0.012) 29px),
+        repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.006) 28px, rgba(0,0,0,0.006) 29px);
+    }
+
+    /* ── Gold top rule ── */
+    .top-rule {
+      position: relative; z-index: 1;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold2) 50%, var(--gold) 80%, transparent 100%);
+    }
+
+    /* ── Page ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 580px; margin: 0 auto;
+      padding: 52px max(28px, env(safe-area-inset-right)) 72px max(28px, env(safe-area-inset-left));
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* ── Header section ── */
+    .eyebrow {
+      font-size: 0.65rem; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--gold); font-weight: 500;
+      margin-bottom: 6px;
+      animation: fadeIn 1s ease both;
+    }
+
+    .hero-wrap {
+      position: relative; text-align: center; margin-bottom: 4px;
+      animation: fadeIn 1s 0.2s ease both;
+    }
+
+    /* decorative botanical flanking the name */
+    .hero-wrap .botanics {
+      position: absolute; top: 50%; transform: translateY(-56%);
+      width: 72px; pointer-events: none;
+      opacity: 0.38;
+    }
+    .hero-wrap .botanics.left  { right: calc(100% + 10px); }
+    .hero-wrap .botanics.right { left: calc(100% + 10px); transform: translateY(-56%) scaleX(-1); }
+
+    .hero-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.8rem, 16vw, 7rem);
+      font-style: italic; font-weight: 300;
+      line-height: 0.9;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      display: block;
+    }
+
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      font-style: italic; font-weight: 300;
+      color: var(--ink3); letter-spacing: 0.12em;
+      margin-top: 8px; display: block;
+    }
+
+    /* ── Gold rule with botanical center ── */
+    .divider {
+      display: flex; align-items: center; gap: 14px;
+      width: 100%; margin: 28px 0 32px;
+      animation: fadeIn 1s 0.35s ease both;
+    }
+    .div-line { flex: 1; height: 1px; background: var(--gold); opacity: 0.35; }
+    .div-center {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .div-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); opacity: 0.7; }
+    .div-diamond {
+      width: 7px; height: 7px; background: var(--gold);
+      transform: rotate(45deg);
+    }
+
+    /* ── Pull quote — centrepiece ── */
+    .pull-quote-wrap {
+      position: relative; text-align: center;
+      margin-bottom: 38px; padding: 0 12px;
+      animation: fadeIn 1s 0.5s ease both;
+    }
+    .pull-mark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 7rem; line-height: 0.4;
+      color: var(--gold); opacity: 0.18;
+      display: block; text-align: left;
+      margin-left: -4px;
+      user-select: none;
+    }
+    .pull-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.5rem, 5.5vw, 2.1rem);
+      font-style: italic; font-weight: 300;
+      color: var(--ink); line-height: 1.65;
+      margin-top: -20px; position: relative; z-index: 1;
+    }
+    .pull-text em { color: var(--gold); font-style: inherit; }
+
+    /* ── Three notes ── */
+    .notes { width: 100%; margin-bottom: 36px; }
+
+    .note {
+      display: flex; gap: 18px; align-items: flex-start;
+      padding: 20px 0;
+      border-top: 1px solid var(--paper3);
+      animation: fadeIn 1s ease both;
+    }
+    .note:last-child { border-bottom: 1px solid var(--paper3); }
+    .note:nth-child(1) { animation-delay: 0.65s; }
+    .note:nth-child(2) { animation-delay: 0.8s; }
+    .note:nth-child(3) { animation-delay: 0.95s; }
+
+    .note-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-style: italic; font-weight: 300;
+      color: var(--gold); opacity: 0.6;
+      line-height: 1; flex-shrink: 0; padding-top: 2px;
+      min-width: 20px; text-align: right;
+    }
+    .note-rule { width: 1px; background: var(--paper3); flex-shrink: 0; align-self: stretch; margin: 2px 0; }
+    .note-body { flex: 1; min-width: 0; }
+    .note-label {
+      font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold); font-weight: 500; margin-bottom: 6px; display: block;
+    }
+    .note-text {
+      font-size: clamp(0.9rem, 2.8vw, 1rem);
+      font-weight: 300; line-height: 1.85;
+      color: var(--ink2);
+    }
+    .note-text strong { color: var(--ink); font-weight: 500; }
+
+    /* ── Trait row ── */
+    .traits {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; margin-bottom: 38px;
+      animation: fadeIn 1s 1.1s ease both;
+    }
+    .trait {
+      padding: 5px 14px;
+      border: 1px solid var(--paper3);
+      border-radius: 2px;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--ink3);
+      font-weight: 300;
+      text-transform: lowercase;
+      background: transparent;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .trait:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Closing ── */
+    .closing {
+      text-align: center; margin-bottom: 40px;
+      animation: fadeIn 1s 1.2s ease both;
+    }
+    .closing-svg { display: block; margin: 0 auto 14px; opacity: 0.55; }
+    .closing-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.82rem, 2.5vw, 0.95rem);
+      font-style: italic; font-weight: 300;
+      color: var(--ink3); letter-spacing: 0.06em;
+    }
+
+    /* ── Button ── */
+    .home-btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 11px 28px;
+      border: 1px solid var(--paper3);
+      border-radius: 2px;
+      color: var(--ink3);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 400; letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: border-color 0.22s, color 0.22s;
+      animation: fadeIn 1s 1.3s ease both;
+    }
+    .home-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .home-btn:active { opacity: 0.7; }
+
+    /* ── Bottom rule ── */
+    .bottom-rule { width: 100%; height: 3px; background: linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold2) 50%, var(--gold) 80%, transparent 100%); margin-top: auto; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 420px) {
+      .hero-wrap .botanics { display: none; }
+      .page { padding: 40px 22px 56px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<div class="page">
+
+  <div class="eyebrow" style="animation-delay:0s">made for you</div>
+
+  <!-- Hero -->
+  <div class="hero-wrap">
+    <!-- Left botanical -->
+    <svg class="botanics left" viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60 110 Q50 80 40 60 Q30 40 20 20" stroke="var(--sage)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M40 60 Q28 52 18 58" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M50 80 Q36 76 28 84" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M45 70 Q56 62 66 68" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <ellipse cx="18" cy="57" rx="7" ry="5" transform="rotate(-20 18 57)" stroke="var(--sage2)" stroke-width="0.9" fill="none"/>
+      <ellipse cx="27" cy="85" rx="8" ry="5.5" transform="rotate(15 27 85)" stroke="var(--sage2)" stroke-width="0.9" fill="none"/>
+      <ellipse cx="67" cy="67" rx="7" ry="4.5" transform="rotate(-30 67 67)" stroke="var(--sage2)" stroke-width="0.9" fill="none"/>
+      <circle cx="20" cy="20" r="3" stroke="var(--gold)" stroke-width="0.9" fill="none"/>
+      <path d="M20 17 Q22 14 20 11" stroke="var(--gold)" stroke-width="0.8" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <!-- Right botanical (mirrored via CSS) -->
+    <svg class="botanics right" viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60 110 Q50 80 40 60 Q30 40 20 20" stroke="var(--sage)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <path d="M40 60 Q28 52 18 58" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M50 80 Q36 76 28 84" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M45 70 Q56 62 66 68" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <ellipse cx="18" cy="57" rx="7" ry="5" transform="rotate(-20 18 57)" stroke="var(--sage2)" stroke-width="0.9" fill="none"/>
+      <ellipse cx="27" cy="85" rx="8" ry="5.5" transform="rotate(15 27 85)" stroke="var(--sage2)" stroke-width="0.9" fill="none"/>
+      <ellipse cx="67" cy="67" rx="7" ry="4.5" transform="rotate(-30 67 67)" stroke="var(--sage2)" stroke-width="0.9" fill="none"/>
+      <circle cx="20" cy="20" r="3" stroke="var(--gold)" stroke-width="0.9" fill="none"/>
+      <path d="M20 17 Q22 14 20 11" stroke="var(--gold)" stroke-width="0.8" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <span class="hero-name">Aadhi</span>
+    <span class="hero-sub">always celebrated, every ordinary day</span>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider">
+    <div class="div-line"></div>
+    <div class="div-center">
+      <div class="div-dot"></div>
+      <div class="div-diamond"></div>
+      <div class="div-dot"></div>
+    </div>
+    <div class="div-line"></div>
+  </div>
+
+  <!-- Pull quote -->
+  <div class="pull-quote-wrap">
+    <span class="pull-mark">"</span>
+    <p class="pull-text">
+      Of all the people the universe<br/>
+      could have put in my path —<br/>
+      it chose <em>you</em>.<br/>
+      And I think about that a lot.
+    </p>
+  </div>
+
+  <!-- Three notes -->
+  <div class="notes">
+
+    <div class="note">
+      <span class="note-num">i</span>
+      <div class="note-rule"></div>
+      <div class="note-body">
+        <span class="note-label">on choosing people</span>
+        <p class="note-text">
+          You're not just someone I know. You're someone I
+          <strong>keep choosing</strong>, on ordinary Tuesdays and
+          quiet evenings alike — without even thinking about it.
+          That's what makes it real.
+        </p>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="note-num">ii</span>
+      <div class="note-rule"></div>
+      <div class="note-body">
+        <span class="note-label">on ordinary moments</span>
+        <p class="note-text">
+          You have this rare ability to make things feel
+          <strong>unforgettable</strong> — the laughs, the silences,
+          conversations that somehow stretch past midnight without
+          either of us noticing. All of it lands differently
+          because you're in it.
+        </p>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="note-num">iii</span>
+      <div class="note-rule"></div>
+      <div class="note-body">
+        <span class="note-label">on being lucky</span>
+        <p class="note-text">
+          Not everyone gets a friend who shows up, who listens,
+          who makes you feel <strong>seen</strong> without trying.
+          I got incredibly lucky — and I hope you know,
+          without any doubt, that you mean the world to me.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Traits -->
+  <div class="traits">
+    <span class="trait">endlessly kind</span>
+    <span class="trait">great listener</span>
+    <span class="trait">my favourite chaos</span>
+    <span class="trait">irreplaceable</span>
+    <span class="trait">genuinely wonderful</span>
+    <span class="trait">my person</span>
+  </div>
+
+  <!-- Closing botanical + sign-off -->
+  <div class="closing">
+    <svg class="closing-svg" width="120" height="40" viewBox="0 0 120 40" fill="none">
+      <path d="M10 30 Q30 10 60 20 Q90 30 110 10" stroke="var(--sage)" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <path d="M30 25 Q28 18 34 16" stroke="var(--sage2)" stroke-width="0.8" stroke-linecap="round" fill="none"/>
+      <ellipse cx="26" cy="17" rx="5.5" ry="4" transform="rotate(-15 26 17)" stroke="var(--sage2)" stroke-width="0.8" fill="none"/>
+      <path d="M85 18 Q82 11 88 9" stroke="var(--sage2)" stroke-width="0.8" stroke-linecap="round" fill="none"/>
+      <ellipse cx="81" cy="10" rx="5" ry="3.5" transform="rotate(10 81 10)" stroke="var(--sage2)" stroke-width="0.8" fill="none"/>
+      <circle cx="60" cy="20" r="2.5" stroke="var(--gold)" stroke-width="0.9" fill="none"/>
+    </svg>
+    <span class="closing-text">made for you, with love — because you deserve nice things, always</span>
+  </div>
+
+  <a href="/memory" class="home-btn">← back home</a>
+
+</div>
+
+<div class="bottom-rule"></div>
+
+</body>
+</html>
