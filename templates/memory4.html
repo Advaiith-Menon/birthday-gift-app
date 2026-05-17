@@ -1,92 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Drawings</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Drawings By Me</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box; margin: 0; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none; user-select: none;
+    }
+
+    :root {
+      --ink: #1a1025;
+      --paper: #f5f0e8;
+      --paper2: #ede8db;
+      --accent: #c84b6e;
+      --accent2: #7c4daf;
+      --muted: #8a7f72;
+      --border: rgba(0,0,0,0.08);
+    }
+
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #3d3739;
-      color: #585656;
-      padding: 20px;
+      min-height: 100vh;
+      background: var(--paper);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      padding: max(24px, env(safe-area-inset-top))
+               max(16px, env(safe-area-inset-right))
+               max(40px, env(safe-area-inset-bottom))
+               max(16px, env(safe-area-inset-left));
     }
 
-    h1 {
+    /* ── Texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: relative; z-index: 1;
       text-align: center;
-      color: #e91e63;
-      margin-bottom: 30px;
-      font-size: 2rem;
+      padding-bottom: 32px;
     }
 
+    .header-eyebrow {
+      font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted); font-weight: 500; margin-bottom: 10px;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-style: italic; font-weight: 400;
+      color: var(--ink); line-height: 1.1;
+    }
+
+    .header-line {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-top: 12px;
+    }
+    .header-rule { flex: 1; max-width: 80px; height: 1px; background: var(--accent); opacity: 0.4; }
+    .header-sub {
+      font-size: 0.78rem; color: var(--muted); font-weight: 300; letter-spacing: 0.04em;
+    }
+
+    /* ── Gallery grid ── */
     .gallery {
+      position: relative; z-index: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      max-width: 1000px;
-      margin: auto;
+      grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+      gap: clamp(14px, 3vw, 24px);
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    .drawing-card {
+    /* ── Card ── */
+    .card {
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.08),
+        0 6px 20px rgba(0,0,0,0.07),
+        4px 4px 0 var(--paper2);
+      border: 1px solid var(--border);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
       overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .drawing-card:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    .card:hover {
+      transform: translateY(-4px) rotate(-0.4deg);
+      box-shadow:
+        0 2px 6px rgba(0,0,0,0.1),
+        0 14px 36px rgba(0,0,0,0.12),
+        5px 5px 0 var(--paper2);
     }
 
-    .drawing-card img {
-      width: 100%;
-      height: auto;
-      display: block;
+    .card:active { transform: scale(0.97); }
+
+    /* polaroid-style top padding */
+    .card-img-wrap {
+      padding: 10px 10px 0;
+      background: #fff;
+    }
+
+    .card img {
+      width: 100%; aspect-ratio: 4/3;
+      object-fit: cover; display: block;
+      border-radius: 2px;
+    }
+
+    .card-footer {
+      padding: 10px 12px 14px;
+      text-align: center;
     }
 
     .caption {
-      padding: 10px 15px;
-      font-size: 0.95rem;
-      text-align: center;
-      color: #555;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.78rem, 2.2vw, 0.88rem);
+      font-style: italic; color: #555;
     }
 
-    .back-btn {
-      display: block;
-      text-align: center;
-      margin-top: 40px;
-      color: #999;
-      font-size: 1rem;
-      text-decoration: underline;
-      transition: color 0.3s ease;
+    /* ── Hover zoom icon ── */
+    .card-overlay {
+      position: absolute; inset: 0 0 40px;
+      background: rgba(26,16,37,0);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.22s ease;
+      border-radius: 2px;
+    }
+    .zoom-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      opacity: 0; transform: scale(0.7);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .card:hover .card-overlay { background: rgba(26,16,37,0.18); }
+    .card:hover .zoom-icon    { opacity: 1; transform: scale(1); }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(10,6,16,0.95);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .lightbox.open {
+      opacity: 1; pointer-events: all;
     }
 
-    .back-btn:hover {
-      color: #000;
+    .lb-img-wrap {
+      position: relative;
+      max-width: min(90vw, 700px);
+      max-height: 75vh;
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 80px rgba(0,0,0,0.6);
+      background: #111;
     }
+
+    .lb-img-wrap img {
+      width: 100%; height: 100%;
+      max-height: 75vh;
+      object-fit: contain; display: block;
+    }
+
+    .lb-caption {
+      margin-top: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(0.95rem, 3vw, 1.15rem);
+      font-style: italic; color: rgba(255,255,255,0.75);
+      text-align: center;
+    }
+
+    .lb-counter {
+      margin-top: 6px;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* close button */
+    .lb-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+      z-index: 10;
+    }
+    .lb-close:hover { background: rgba(255,255,255,0.2); }
+
+    /* prev / next */
+    .lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff; font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      touch-action: manipulation;
+    }
+    .lb-nav:hover  { background: rgba(255,255,255,0.18); }
+    .lb-nav:active { transform: translateY(-50%) scale(0.92); }
+    .lb-nav:disabled { opacity: 0.2; cursor: default; }
+    .lb-prev { left: 12px; }
+    .lb-next { right: 12px; }
+
+    /* ── Back link ── */
+    .back-link {
+      position: relative; z-index: 1;
+      display: block; text-align: center;
+      margin-top: clamp(28px, 6vw, 44px);
+      color: var(--muted); font-size: 0.82rem;
+      text-decoration: none; transition: color 0.2s;
+      padding: 6px 0;
+    }
+    .back-link:hover { color: var(--accent); }
   </style>
 </head>
 <body>
-  <h1>🖌️ Drawings by Me</h1>
-  <div class="gallery">
-    <div class="drawing-card">
-        <img src="/static/mem1.jpg" alt="Drawing 1">
-        <div class="caption">"The idivaal Aadhi"</div>
+
+  <div class="header">
+    <div class="header-eyebrow">A Creative Collection</div>
+    <h1>🖌 Drawings by Me</h1>
+    <div class="header-line">
+      <div class="header-rule"></div>
+      <div class="header-sub">Tap any piece to explore</div>
+      <div class="header-rule"></div>
     </div>
-    <div class="drawing-card">
-        <img src="/static/mem2.jpg" alt="Drawing X">
-        <div class="caption">"Midnight Dreamscape"</div>
-    </div>
-    <div class="drawing-card">
-        <img src="/static/mem3.jpg" alt="Drawing 3">
-        <div class="caption">"Sunset Silhouettes"</div>
-    </div>
-    
   </div>
 
-  <a href="/memory" class="back-btn">⬅ Back to Home</a>
+  <div class="gallery" id="gallery"></div>
+
+  <a href="/memory" class="back-link">⬅ Back to Home</a>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" id="lb-close">✕</button>
+    <button class="lb-nav lb-prev" id="lb-prev">&#8592;</button>
+    <button class="lb-nav lb-next" id="lb-next">&#8594;</button>
+    <div class="lb-img-wrap">
+      <img id="lb-img" src="" alt=""/>
+    </div>
+    <div class="lb-caption" id="lb-caption"></div>
+    <div class="lb-counter" id="lb-counter"></div>
+  </div>
+
+<script>
+  const DRAWINGS = [
+    { src: "/static/mem1.jpg", caption: "The idivaal Aadhi" },
+    { src: "/static/mem2.jpg", caption: "Midnight Dreamscape" },
+    { src: "/static/mem3.jpg", caption: "Sunset Silhouettes" },
+  ];
+
+  const gallery   = document.getElementById('gallery');
+  const lightbox  = document.getElementById('lightbox');
+  const lbImg     = document.getElementById('lb-img');
+  const lbCaption = document.getElementById('lb-caption');
+  const lbCounter = document.getElementById('lb-counter');
+  const lbClose   = document.getElementById('lb-close');
+  const lbPrev    = document.getElementById('lb-prev');
+  const lbNext    = document.getElementById('lb-next');
+
+  let current = 0;
+
+  // Build gallery
+  DRAWINGS.forEach((d, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${d.src}" alt="${d.caption}" loading="lazy"/>
+        <div class="card-overlay"><div class="zoom-icon">🔍</div></div>
+      </div>
+      <div class="card-footer">
+        <div class="caption">"${d.caption}"</div>
+      </div>`;
+    card.addEventListener('click', () => openLightbox(i));
+    gallery.appendChild(card);
+  });
+
+  function openLightbox(idx) {
+    current = idx;
+    updateLightbox();
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function updateLightbox() {
+    const d = DRAWINGS[current];
+    lbImg.style.opacity = 0;
+    setTimeout(() => {
+      lbImg.src = d.src;
+      lbImg.alt = d.caption;
+      lbImg.style.opacity = 1;
+    }, 120);
+    lbCaption.textContent = `"${d.caption}"`;
+    lbCounter.textContent = `${current + 1} of ${DRAWINGS.length}`;
+    lbPrev.disabled = current === 0;
+    lbNext.disabled = current === DRAWINGS.length - 1;
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', () => { if (current > 0) { current--; updateLightbox(); } });
+  lbNext.addEventListener('click', () => { if (current < DRAWINGS.length - 1) { current++; updateLightbox(); } });
+
+  // Close on backdrop click
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft'  && current > 0)                    { current--; updateLightbox(); }
+    if (e.key === 'ArrowRight' && current < DRAWINGS.length - 1)  { current++; updateLightbox(); }
+  });
+
+  // Swipe in lightbox
+  let swipeStartX = 0;
+  lightbox.addEventListener('touchstart', e => { swipeStartX = e.changedTouches[0].clientX; }, { passive: true });
+  lightbox.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - swipeStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0 && current < DRAWINGS.length - 1) { current++; updateLightbox(); }
+      if (dx > 0 && current > 0)                   { current--; updateLightbox(); }
+    }
+  }, { passive: true });
+
+  // img transition
+  lbImg.style.transition = 'opacity 0.2s ease';
+</script>
 </body>
 </html>

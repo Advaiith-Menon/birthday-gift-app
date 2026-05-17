@@ -12,7 +12,6 @@
       -webkit-user-select: none; user-select: none;
     }
 
-    /* ── iOS-safe full-screen bg (no background-attachment:fixed) ── */
     .bg-fixed {
       position: fixed; inset: 0; z-index: 0;
       background-image: url("/static/AD_pics/Aadhi_bg.jpg");
@@ -36,14 +35,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      /* safe-area for notched phones */
       padding: max(16px, env(safe-area-inset-top))
                max(16px, env(safe-area-inset-right))
                max(24px, env(safe-area-inset-bottom))
                max(16px, env(safe-area-inset-left));
     }
 
-    /* ── Card ── */
     .card {
       position: relative; z-index: 1;
       width: 100%; max-width: 420px;
@@ -51,7 +48,6 @@
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(210,170,100,0.35);
       border-radius: clamp(20px, 5vw, 28px);
-      /* tighter padding on small screens */
       padding: clamp(18px, 5vw, 32px) clamp(16px, 5vw, 24px) clamp(16px, 4vw, 24px);
       box-shadow:
         0 8px 40px rgba(140,80,20,0.18),
@@ -59,7 +55,6 @@
         inset 0 1px 0 rgba(255,255,255,0.8);
     }
 
-    /* ── Header ── */
     .header { text-align: center; margin-bottom: clamp(14px, 4vw, 24px); }
 
     .eyebrow {
@@ -81,7 +76,7 @@
       color: #9a6840; font-weight: 300;
     }
 
-    /* ── Photo frame ── */
+    /* ── Photo frame: two stacked images for crossfade ── */
     .photo-wrap {
       position: relative;
       border-radius: clamp(12px, 3vw, 18px); overflow: hidden;
@@ -89,7 +84,6 @@
         0 4px 24px rgba(100,50,10,0.22),
         0 0 0 3px rgba(210,170,100,0.3),
         0 0 0 6px rgba(255,248,235,0.6);
-      /* use max-height so it never pushes controls off screen */
       aspect-ratio: 4/3;
       max-height: 48vh;
       background: #e8d5b0;
@@ -97,13 +91,25 @@
     }
 
     .photo-wrap img {
+      position: absolute;
+      inset: 0;
       width: 100%; height: 100%;
       object-fit: cover; display: block;
+      z-index: 1;
+    }
+
+    #img-a {
+      z-index: 1;
+    }
+
+    #img-b {
+      z-index: 2;
+      opacity: 0;
       transition: opacity 0.35s ease;
     }
 
     .grain {
-      position: absolute; inset: 0; pointer-events: none;
+      position: absolute; inset: 0; pointer-events: none; z-index: 3;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
       mix-blend-mode: multiply; opacity: 0.5;
     }
@@ -111,7 +117,7 @@
     .corner {
       position: absolute; width: 16px; height: 16px;
       border-color: rgba(180,130,60,0.5); border-style: solid;
-      pointer-events: none;
+      pointer-events: none; z-index: 4;
     }
     .corner.tl { top: 7px; left: 7px;   border-width: 2px 0 0 2px; }
     .corner.tr { top: 7px; right: 7px;  border-width: 2px 2px 0 0; }
@@ -119,7 +125,7 @@
     .corner.br { bottom: 7px; right: 7px; border-width: 0 2px 2px 0; }
 
     .photo-badge {
-      position: absolute; bottom: 10px; right: 10px;
+      position: absolute; bottom: 10px; right: 10px; z-index: 4;
       background: rgba(255,248,230,0.88);
       backdrop-filter: blur(6px);
       border: 1px solid rgba(210,170,100,0.4);
@@ -130,7 +136,6 @@
       color: #7a4820;
     }
 
-    /* ── Swipe hint (mobile only) ── */
     .swipe-hint {
       text-align: center;
       font-size: 0.68rem; color: #b07840;
@@ -138,7 +143,6 @@
       letter-spacing: 0.04em; opacity: 0.8;
     }
 
-    /* ── Dots ── */
     .dots {
       display: flex; justify-content: center;
       gap: clamp(5px, 1.8vw, 8px);
@@ -153,16 +157,13 @@
       transition: background 0.25s, transform 0.2s, border-color 0.25s;
       position: relative;
     }
-    .dot::after {
-      content: ''; position: absolute; inset: -8px; border-radius: 50%;
-    }
+    .dot::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
     .dot.active {
       background: #c07030;
       border-color: #c07030;
       transform: scale(1.35);
     }
 
-    /* ── Slider ── */
     .slider-section { margin-bottom: clamp(12px, 3.5vw, 20px); }
 
     .slider-labels {
@@ -190,7 +191,6 @@
 
     input[type=range] {
       position: absolute; left: 0; right: 0; width: 100%;
-      /* taller hit area is easier to grab on phone */
       height: 36px; opacity: 0; cursor: pointer; z-index: 3;
       -webkit-appearance: none; appearance: none; margin: 0;
     }
@@ -207,7 +207,6 @@
       transition: left 0.12s ease;
     }
 
-    /* ── Nav buttons — big enough to tap comfortably ── */
     .nav-row {
       display: flex; align-items: center; justify-content: center;
       gap: clamp(12px, 4vw, 20px);
@@ -224,7 +223,6 @@
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s, transform 0.1s;
-      /* prevent double-tap zoom on mobile */
       touch-action: manipulation;
     }
     .nav-btn:hover  { background: rgba(200,140,60,0.22); }
@@ -237,14 +235,12 @@
       color: #7a4820; min-width: 72px; text-align: center;
     }
 
-    /* ── Back link ── */
     .back-link {
       display: block; text-align: center;
       margin-top: clamp(14px, 4vw, 22px);
       color: #b07840;
       font-size: clamp(0.78rem, 2.5vw, 0.85rem);
       text-decoration: none; transition: color 0.2s;
-      /* comfortable tap area */
       padding: 6px 0;
     }
     .back-link:hover { color: #6a3810; }
@@ -262,7 +258,9 @@
   </div>
 
   <div class="photo-wrap" id="photo-wrap">
-    <img id="photo" src="/static/AD_pics/Aadhi1.jpg" alt="Photo"/>
+    <!-- Two layers: img-a always shows current, img-b fades in on top then we swap -->
+    <img id="img-a" src="/static/AD_pics/Aadhi1.jpg" alt="Photo"/>
+    <img id="img-b" src="" alt="Photo"/>
     <div class="grain"></div>
     <div class="corner tl"></div>
     <div class="corner tr"></div>
@@ -310,8 +308,10 @@
 
   const total = 10;
   let current = 1;
+  let transitioning = false;
 
-  const photo    = document.getElementById('photo');
+  const imgA     = document.getElementById('img-a');
+  const imgB     = document.getElementById('img-b');
   const slider   = document.getElementById('slider');
   const fill     = document.getElementById('slider-fill');
   const thumb    = document.getElementById('slider-thumb');
@@ -330,10 +330,10 @@
     dotsWrap.appendChild(d);
   }
 
-  // Preload all
-  Object.values(IMAGES).forEach(src => { new Image().src = src; });
+  // Preload all images so they're cached before user reaches them
+  Object.values(IMAGES).forEach(src => { const img = new Image(); img.src = src; });
 
-  function updateUI(idx) {
+  function updateChrome(idx) {
     const pct = ((idx - 1) / (total - 1)) * 100;
     fill.style.width     = pct + '%';
     thumb.style.left     = pct + '%';
@@ -348,21 +348,43 @@
   }
 
   function goTo(idx) {
-    if (idx === current || idx < 1 || idx > total) return;
+    if (idx === current || idx < 1 || idx > total || transitioning) return;
+    transitioning = true;
     current = idx;
-    photo.style.opacity = 0;
-    setTimeout(() => {
-      photo.src = IMAGES[current];
-      photo.style.opacity = 1;
-    }, 200);
-    updateUI(current);
+    updateChrome(current);
+
+    const nextSrc = IMAGES[idx];
+
+    // Preload silently first so the crossfade is instant once it starts
+    const loader = new Image();
+    loader.onload = () => {
+      // Point img-b (on top) at the new photo, then fade it in over img-a
+      imgB.src = nextSrc;
+      // Force a reflow so the transition fires from opacity:0
+      imgB.getBoundingClientRect();
+      imgB.style.opacity = '1';
+
+      // Once faded in: make img-a take the new src, reset img-b instantly (no transition)
+      setTimeout(() => {
+        imgA.src = nextSrc;
+        imgB.style.transition = 'none';
+        imgB.style.opacity = '0';
+        // Re-enable transition after reset so next fade works
+        requestAnimationFrame(() => {
+          imgB.style.transition = 'opacity 0.35s ease';
+        });
+        transitioning = false;
+      }, 370);
+    };
+    loader.onerror = () => { imgA.src = nextSrc; transitioning = false; };
+    loader.src = nextSrc;
   }
 
   slider.addEventListener('input', () => goTo(parseInt(slider.value)));
   prevBtn.addEventListener('click', () => goTo(current - 1));
   nextBtn.addEventListener('click', () => goTo(current + 1));
 
-  // ── Swipe on photo ──
+  // Swipe on photo
   let touchStartX = 0;
   photoWrap.addEventListener('touchstart', e => {
     touchStartX = e.changedTouches[0].clientX;
@@ -374,7 +396,7 @@
     }
   }, { passive: true });
 
-  updateUI(1);
+  updateChrome(1);
 </script>
 </body>
 </html>
