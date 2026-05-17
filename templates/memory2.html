@@ -32,7 +32,8 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
   display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .hdr-eye::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(201,168,76,.35),transparent)}
 .hdr-name{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,8vw,4.2rem);font-style:italic;
-  font-weight:300;line-height:1;margin-bottom:8px;
+  font-weight:300;line-height:1.2;margin-bottom:8px;
+  display:inline-block;width:100%;
   background:linear-gradient(135deg,var(--txt) 0%,var(--gold2) 60%,var(--txt) 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hdr-sub{font-size:12px;color:var(--t2)}
@@ -109,7 +110,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .bar-up svg{width:15px;height:15px}
 
 /* ── FULL PLAYER SHEET ── */
-.sheet{position:absolute;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;transform:translateY(100%);transition:transform .55s cubic-bezier(.32,1,.25,1);overflow:hidden}
+.sheet{position:absolute;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;transform:translateY(100%);transition:transform .55s cubic-bezier(.32,1,.25,1);overflow:hidden;touch-action:none}
 .sheet.open{transform:translateY(0)}
 .sheet::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 110% 60% at 50% -5%,rgba(201,168,76,.1),transparent 55%),radial-gradient(ellipse 70% 50% at 100% 100%,rgba(90,60,180,.07),transparent 60%)}
 
@@ -120,16 +121,17 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .sh-close:hover{color:var(--txt);background:rgba(255,255,255,.14)}
 .sh-close svg{width:18px;height:18px}
 
-.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:8px 32px 40px;overflow-y:auto;scrollbar-width:none;gap:0}
+.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:6px 28px 16px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;gap:0;-webkit-overflow-scrolling:touch}
 .sh-body::-webkit-scrollbar{display:none}
 
 /* ── VINYL WRAP — tonearm is a SIBLING of the disc, not inside it ── */
 .vin-wrap{
   position:relative;
-  width:min(68vw,300px);
+  /* Never taller than 38% of the viewport so everything fits below */
+  width:min(56vw, 38dvh, 260px);
   aspect-ratio:1;
   flex-shrink:0;
-  margin-bottom:32px;
+  margin-bottom:16px;
 }
 
 .vin-glow{position:absolute;inset:-40px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(201,168,76,.22),rgba(90,60,180,.14),transparent 70%);opacity:0;transition:opacity 1.2s}
@@ -177,17 +179,17 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 }
 .tonearm.on{transform:rotate(-5deg)}
 
-.sh-song{width:100%;text-align:center;margin-bottom:24px}
-.sh-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.15;margin-bottom:10px}
+.sh-song{width:100%;text-align:center;margin-bottom:14px}
+.sh-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(1.5rem,5.5vw,2.2rem);line-height:1.15;margin-bottom:8px}
 @keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .sh-title.anim{animation:tin .38s cubic-bezier(.34,1.2,.64,1) forwards}
 .sh-lang{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.32);padding:3px 10px;border-radius:3px;background:rgba(201,168,76,.08);display:inline-block;margin-right:8px}
 .sh-type{font-size:11px;color:var(--t2)}
 
-.sh-viz{width:100%;height:40px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.018);margin-bottom:20px;flex-shrink:0}
+.sh-viz{width:100%;height:32px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.018);margin-bottom:12px;flex-shrink:0}
 #viz{width:100%;height:100%;display:block}
 
-.sh-prog{width:100%;margin-bottom:22px}
+.sh-prog{width:100%;margin-bottom:14px}
 .prow{position:relative;height:26px;display:flex;align-items:center;cursor:pointer;margin-bottom:7px}
 .ptrack{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.08);pointer-events:none;overflow:hidden}
 .pfill{height:100%;width:0%;border-radius:2px;background:linear-gradient(to right,var(--gold),var(--gold2));pointer-events:none}
@@ -196,7 +198,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .pinput{position:absolute;left:0;right:0;width:100%;height:26px;opacity:0;cursor:pointer;z-index:3}
 .trow{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:.04em}
 
-.sh-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:22px;width:100%}
+.sh-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;width:100%}
 .ctr{background:none;border:none;color:var(--t2);cursor:pointer;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,transform .12s}
 .ctr:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .ctr:active{transform:scale(.82)}
@@ -220,7 +222,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .vinput{position:absolute;left:0;right:0;width:100%;height:22px;opacity:0;cursor:pointer;z-index:3}
 
 /* queue open button */
-.queue-btn{display:flex;align-items:center;gap:10px;margin-top:18px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:12px;padding:12px 16px;cursor:pointer;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;transition:background .18s,border-color .18s,color .18s}
+.queue-btn{display:flex;align-items:center;gap:10px;margin-top:12px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:12px;padding:10px 16px;cursor:pointer;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;transition:background .18s,border-color .18s,color .18s}
 .queue-btn:hover{background:rgba(255,255,255,.07);border-color:var(--b2);color:var(--txt)}
 .queue-btn svg{width:15px;height:15px;flex-shrink:0}
 .qb-label{flex:1;text-align:left;letter-spacing:.04em}
@@ -244,7 +246,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .q-add-list{display:flex;flex-direction:column;gap:3px}
 .q-add-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s}
 .q-add-row:hover{background:var(--hover);border-color:var(--b1)}
-.q-add-row.already-queued{opacity:.4;cursor:default;pointer-events:none}
+/* already-queued class removed — duplicates allowed */
 .q-add-art{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--b1);position:relative;overflow:hidden}
 .q-add-art::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none}
 .q-add-art svg{position:relative;z-index:1}
@@ -301,18 +303,38 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
   .t-art{width:46px;height:46px;border-radius:11px}
   .t-title{font-size:13px}
   .bar{padding:0 14px}
-  .sh-body{padding:8px 22px 16px}
-  .vin-wrap{width:min(74vw,260px);margin-bottom:22px}
-  .sh-song{margin-bottom:18px}
-  .cplay{width:64px;height:64px}
-  .cskip{width:44px;height:44px}
+  /* Sheet: fit everything in one screen, no scrolling needed */
+  .sh-body{padding:4px 20px 8px}
+  /* Vinyl: max 30% of screen height so controls fit below */
+  .vin-wrap{width:min(48vw,30dvh,200px);margin-bottom:10px}
+  .vin-glow{inset:-20px}
+  .sh-song{margin-bottom:8px}
+  .sh-title{font-size:1.45rem;margin-bottom:6px}
+  .sh-lang{font-size:8px;padding:2px 7px}
+  .sh-viz{height:24px;margin-bottom:8px}
+  .sh-prog{margin-bottom:8px}
+  .prow{height:20px;margin-bottom:5px}
+  .pthumb{width:13px;height:13px}
+  .sh-ctrl{margin-bottom:8px;gap:5px}
+  .cplay{width:56px;height:56px}
+  .cplay svg{width:24px;height:24px}
+  .cskip{width:40px;height:40px}
+  .cskip svg{width:19px;height:19px}
+  .ctr{width:34px;height:34px}
+  .ctr svg{width:17px;height:17px}
+  .sh-vol{gap:8px}
+  .queue-btn{margin-top:8px;padding:8px 12px;font-size:11px;border-radius:10px}
 }
 @media(min-width:700px){
   .hdr{padding:60px 48px 28px}
   .plist{padding:0 36px 8px}
   .bar{padding:0 36px}
   .sh-body{padding:8px 48px 24px}
-  .vin-wrap{width:min(60vw,320px);margin-bottom:36px}
+  .vin-wrap{width:min(55vw,42dvh,300px);margin-bottom:24px}
+  .sh-song{margin-bottom:18px}
+  .sh-viz{height:38px;margin-bottom:16px}
+  .sh-prog{margin-bottom:18px}
+  .sh-ctrl{margin-bottom:18px}
 }
 </style>
 </head>
@@ -581,34 +603,30 @@ sheet.addEventListener('transitionend',()=>{if(!sheet.classList.contains('open')
 
 /* ── RENDER ADD-SONGS SECTION ── */
 function renderAddSection(){
-  const upcomingSet=new Set(queue.slice(qpos+1));
+  const upcomingArr=queue.slice(qpos+1);
+  const countInQueue=idx=>upcomingArr.filter(x=>x===idx).length;
   const nowSongIdx=queue[qpos];
   qAddList.innerHTML='';
   SONGS.forEach((s,i)=>{
-    if(i===nowSongIdx)return; // skip now-playing
-    const alreadyQueued=upcomingSet.has(i);
+    if(i===nowSongIdx)return;
+    const count=countInQueue(i);
     const row=document.createElement('div');
-    row.className='q-add-row'+(alreadyQueued?' already-queued':'');
+    row.className='q-add-row';
     row.innerHTML=`
       <div class="q-add-art" style="background:${s.color}">${noteIcon(s.accent,16)}</div>
       <div class="q-add-info">
         <div class="q-add-title">${s.title}</div>
-        <div class="q-add-sub">${s.lang} · Cover</div>
+        <div class="q-add-sub">${s.lang} · Cover${count>0?' · <span style=\"color:var(--gold);font-size:10px\">'+count+'× queued</span>':''}</div>
       </div>
-      ${alreadyQueued
-        ? '<span class="already-badge">Queued</span>'
-        : `<button class="q-add-btn" data-idx="${i}" title="Add to queue">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-           </button>`
-      }`;
-    if(!alreadyQueued){
-      row.querySelector('.q-add-btn').addEventListener('click',e=>{
-        e.stopPropagation();
-        queue.push(parseInt(e.currentTarget.dataset.idx));
-        renderQueue();
-        renderList();
-      });
-    }
+      <button class="q-add-btn" data-idx="${i}" title="Add to queue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>`;
+    row.querySelector('.q-add-btn').addEventListener('click',e=>{
+      e.stopPropagation();
+      queue.push(parseInt(e.currentTarget.dataset.idx));
+      renderQueue();
+      renderList();
+    });
     qAddList.appendChild(row);
   });
 }
@@ -808,13 +826,9 @@ function renderList(){
         <div class="t-sub">${s.lang} · Cover${inQueue&&!isNow?' · <span style="color:var(--gold);font-size:10px">In queue</span>':''}</div>
       </div>
       <span class="t-dur">${fmt(durs[songIdx])}</span>
-      ${isNow?'':`<button class="t-add" data-idx="${songIdx}" title="${inQueue?'Move to next':'Add to queue'}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          ${inQueue
-            ? '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'
-            : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'}
-        </svg>
-      </button>`}`;
+      <button class="t-add" data-idx="${songIdx}" title="Add to queue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>`;
 
     row.addEventListener('click',e=>{
       if(e.target.closest('.t-add'))return;
@@ -828,10 +842,7 @@ function renderList(){
     if(addBtn){
       addBtn.addEventListener('click',e=>{
         e.stopPropagation();
-        const idx=parseInt(addBtn.dataset.idx);
-        if(!queue.slice(qpos+1).includes(idx)){
-          queue.push(idx);
-        }
+        queue.push(parseInt(addBtn.dataset.idx));
         renderList();renderQueue();
       });
     }
