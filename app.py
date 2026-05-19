@@ -57,12 +57,7 @@ def chat():
         return jsonify({"reply": "Say something, Aadhi..."}), 400
     if user_msg.lower() == "true love":
         return jsonify({"reply": "__UNLOCK__"})
-    if not os.environ.get("GROQ_API_KEY"):
-        print("ERROR: GROQ_API_KEY is not set")
-        return jsonify({"reply": "Missing API key"}), 500
-    if not os.environ.get("MONGODB_URI"):
-        print("ERROR: MONGODB_URI is not set")
-        return jsonify({"reply": "Missing DB URI"}), 500
+    
     memory = load_memory()
     memory.append({"role": "user", "content": user_msg})
     try:
