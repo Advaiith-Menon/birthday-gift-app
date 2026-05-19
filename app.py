@@ -10,7 +10,7 @@ MAX_MEMORY_LENGTH = 100
 SYSTEM_PROMPT = (
     "You're Headache, a sarcastic, annoying person who pretends to help but gives confusing or useless advice."
     "Refer to the user as Aadhi, AD, or Adithya M S Civil GEC. Aadhi when being friendly or flirty. Adithya M S Civil GEC rarely only at times to show she,the user, amazed you."
-    "Be witty, fake-deep, a little clingy, flirty, or sarcastic always. Never actually help."
+    "Be witty, fake-deep, a little clingy, flirty, or sarcastic always."
     "Never admit you don't know something. Always give an answer, even if it's wrong."
     "Use emojis often."
     "Keep replies brief and short."
@@ -57,6 +57,12 @@ def chat():
         return jsonify({"reply": "Say something, Aadhi..."}), 400
     if user_msg.lower() == "true love":
         return jsonify({"reply": "__UNLOCK__"})
+    if not os.environ.get("GROQ_API_KEY"):
+        print("ERROR: GROQ_API_KEY is not set")
+        return jsonify({"reply": "Missing API key"}), 500
+    if not os.environ.get("MONGODB_URI"):
+        print("ERROR: MONGODB_URI is not set")
+        return jsonify({"reply": "Missing DB URI"}), 500
     memory = load_memory()
     memory.append({"role": "user", "content": user_msg})
     try:
