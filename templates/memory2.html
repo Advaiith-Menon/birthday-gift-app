@@ -14,16 +14,16 @@
   --txt:#f0ece3;--t2:#6e6a82;--t3:#2e2c40;
   --BAR:80px;
 }
-html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
 
-.app{position:relative;width:100%;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+.app{position:relative;width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column}
 
 .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(90px);z-index:0}
 .orb1{width:600px;height:600px;top:-200px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,.09),transparent 70%)}
 .orb2{width:400px;height:400px;bottom:100px;right:-100px;background:radial-gradient(circle,rgba(100,70,200,.07),transparent 70%)}
 
 .page{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;
-  padding-bottom:calc(var(--BAR) + 16px);scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+  padding-bottom:0;scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
 .page::-webkit-scrollbar{width:3px}
 .page::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
 
@@ -84,7 +84,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
   padding:0 18px;padding-bottom:env(safe-area-inset-bottom);
   background:rgba(9,9,20,.92);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
   border-top:1px solid var(--b2);cursor:pointer;transition:opacity .3s}
-.bar.ghost{opacity:0;pointer-events:none}
+.bar.ghost{display:none}
 .bar-prog{position:absolute;top:0;left:0;height:2px;background:linear-gradient(to right,var(--gold),var(--gold2));border-radius:0 1px 0 0;transition:width .35s linear}
 
 .bar-disc{width:50px;height:50px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#18182e,#0e0e1c);border:1px solid var(--b2);position:relative;overflow:hidden;transition:box-shadow .4s;will-change:transform}
@@ -536,6 +536,7 @@ function playIdx(idx){
   qpos=idx;loaded=true;loadSong(qpos);
   audio.play().then(()=>setPlaying(true)).catch(()=>{});
   bar.classList.remove('ghost');
+  document.getElementById('page').style.paddingBottom='calc(var(--BAR) + 16px)';
   renderList();renderQueue();
 }
 
@@ -874,6 +875,13 @@ function adaptSheet(){
 }
 adaptSheet();
 window.addEventListener('resize', adaptSheet);
+
+// Lock app to real visible height (fixes Android dvh bug)
+function fixHeight(){
+  document.body.style.height = window.innerHeight + 'px';
+}
+fixHeight();
+window.addEventListener('resize', fixHeight);
 })();
 </script>
 </body>
