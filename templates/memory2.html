@@ -110,7 +110,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .bar-up svg{width:15px;height:15px}
 
 /* ── FULL PLAYER SHEET ── */
-.sheet{position:absolute;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;transform:translateY(100%);transition:transform .55s cubic-bezier(.32,1,.25,1);overflow:hidden;touch-action:none}
+.sheet{position:absolute;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;transform:translateY(100%);transition:transform .55s cubic-bezier(.32,1,.25,1);overflow:hidden}
 .sheet.open{transform:translateY(0)}
 .sheet::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 110% 60% at 50% -5%,rgba(201,168,76,.1),transparent 55%),radial-gradient(ellipse 70% 50% at 100% 100%,rgba(90,60,180,.07),transparent 60%)}
 
@@ -121,17 +121,16 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .sh-close:hover{color:var(--txt);background:rgba(255,255,255,.14)}
 .sh-close svg{width:18px;height:18px}
 
-.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:6px 28px 16px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;gap:0;-webkit-overflow-scrolling:touch}
+.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:4px var(--sh-px,28px) 12px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;gap:0;-webkit-overflow-scrolling:touch}
 .sh-body::-webkit-scrollbar{display:none}
 
 /* ── VINYL WRAP — tonearm is a SIBLING of the disc, not inside it ── */
 .vin-wrap{
   position:relative;
-  /* Never taller than 38% of the viewport so everything fits below */
-  width:min(56vw, 38dvh, 260px);
-  aspect-ratio:1;
+  width:var(--vin-size,200px);
+  height:var(--vin-size,200px);
   flex-shrink:0;
-  margin-bottom:16px;
+  margin-bottom:var(--sh-gap,12px);
 }
 
 .vin-glow{position:absolute;inset:-40px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(201,168,76,.22),rgba(90,60,180,.14),transparent 70%);opacity:0;transition:opacity 1.2s}
@@ -179,17 +178,17 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 }
 .tonearm.on{transform:rotate(-5deg)}
 
-.sh-song{width:100%;text-align:center;margin-bottom:14px}
-.sh-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(1.5rem,5.5vw,2.2rem);line-height:1.15;margin-bottom:8px}
+.sh-song{width:100%;text-align:center;margin-bottom:var(--sh-gap,12px)}
+.sh-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:var(--sh-title-size,clamp(1.5rem,5.5vw,2.2rem));line-height:1.15;margin-bottom:calc(var(--sh-gap,12px) * 0.5)}
 @keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .sh-title.anim{animation:tin .38s cubic-bezier(.34,1.2,.64,1) forwards}
 .sh-lang{font-size:9px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.32);padding:3px 10px;border-radius:3px;background:rgba(201,168,76,.08);display:inline-block;margin-right:8px}
 .sh-type{font-size:11px;color:var(--t2)}
 
-.sh-viz{width:100%;height:32px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.018);margin-bottom:12px;flex-shrink:0}
+.sh-viz{width:100%;height:var(--sh-viz-h,32px);border-radius:8px;overflow:hidden;background:rgba(255,255,255,.018);margin-bottom:var(--sh-gap,12px);flex-shrink:0}
 #viz{width:100%;height:100%;display:block}
 
-.sh-prog{width:100%;margin-bottom:14px}
+.sh-prog{width:100%;margin-bottom:var(--sh-gap,12px)}
 .prow{position:relative;height:26px;display:flex;align-items:center;cursor:pointer;margin-bottom:7px}
 .ptrack{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.08);pointer-events:none;overflow:hidden}
 .pfill{height:100%;width:0%;border-radius:2px;background:linear-gradient(to right,var(--gold),var(--gold2));pointer-events:none}
@@ -198,20 +197,20 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .pinput{position:absolute;left:0;right:0;width:100%;height:26px;opacity:0;cursor:pointer;z-index:3}
 .trow{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:.04em}
 
-.sh-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;width:100%}
-.ctr{background:none;border:none;color:var(--t2);cursor:pointer;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,transform .12s}
+.sh-ctrl{display:flex;align-items:center;justify-content:center;gap:var(--sh-ctrl-gap,8px);margin-bottom:var(--sh-gap,12px);width:100%}
+.ctr{background:none;border:none;color:var(--t2);cursor:pointer;width:var(--sh-ctr-size,42px);height:var(--sh-ctr-size,42px);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,transform .12s}
 .ctr:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .ctr:active{transform:scale(.82)}
 .ctr.on{color:var(--gold2)}
 .ctr svg{width:19px;height:19px}
-.cskip{width:50px;height:50px;background:rgba(255,255,255,.06);border:1px solid var(--b1);border-radius:50%;color:var(--txt)}
+.cskip{width:var(--sh-skip-size,50px);height:var(--sh-skip-size,50px);background:rgba(255,255,255,.06);border:1px solid var(--b1);border-radius:50%;color:var(--txt)}
 .cskip:hover{background:rgba(255,255,255,.1)}
 .cskip svg{width:22px;height:22px}
-.cplay{width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;background:conic-gradient(from 135deg,var(--gold),var(--gold2),var(--gold3),var(--gold2),var(--gold));color:#06060e;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(232,204,122,.25),0 10px 44px rgba(201,168,76,.55);transition:transform .15s,box-shadow .2s}
+.cplay{width:var(--sh-play-size,72px);height:var(--sh-play-size,72px);border-radius:50%;border:none;cursor:pointer;flex-shrink:0;background:conic-gradient(from 135deg,var(--gold),var(--gold2),var(--gold3),var(--gold2),var(--gold));color:#06060e;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(232,204,122,.25),0 10px 44px rgba(201,168,76,.55);transition:transform .15s,box-shadow .2s}
 .cplay::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 65% 45% at 32% 22%,rgba(255,255,255,.28),transparent 55%);pointer-events:none}
 .cplay:hover{transform:scale(1.05);box-shadow:0 0 0 1px rgba(232,204,122,.35),0 14px 54px rgba(201,168,76,.7)}
 .cplay:active{transform:scale(.9)}
-.cplay svg{width:30px;height:30px;position:relative;z-index:1;margin-left:3px}
+.cplay svg{width:var(--sh-play-icon,30px);height:var(--sh-play-icon,30px);position:relative;z-index:1;margin-left:3px}
 
 .sh-vol{display:flex;align-items:center;gap:12px;width:100%}
 .vico{color:var(--t3);display:flex;flex-shrink:0}
@@ -222,7 +221,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .vinput{position:absolute;left:0;right:0;width:100%;height:22px;opacity:0;cursor:pointer;z-index:3}
 
 /* queue open button */
-.queue-btn{display:flex;align-items:center;gap:10px;margin-top:12px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:12px;padding:10px 16px;cursor:pointer;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;transition:background .18s,border-color .18s,color .18s}
+.queue-btn{display:flex;align-items:center;gap:10px;margin-top:var(--sh-gap,12px);width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:12px;padding:10px 16px;cursor:pointer;color:var(--t2);font-size:12px;font-family:'DM Sans',sans-serif;transition:background .18s,border-color .18s,color .18s}
 .queue-btn:hover{background:rgba(255,255,255,.07);border-color:var(--b2);color:var(--txt)}
 .queue-btn svg{width:15px;height:15px;flex-shrink:0}
 .qb-label{flex:1;text-align:left;letter-spacing:.04em}
@@ -296,43 +295,18 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .q-remove svg{width:13px;height:13px}
 .q-empty{text-align:center;padding:30px 20px;font-size:13px;color:var(--t3);font-style:italic}
 
-@media(max-width:500px){
+@media(max-width:700px){
   .hdr{padding:40px 18px 18px}
   .plist{padding:0 6px 6px}
   .track{padding:10px;border-radius:13px;gap:10px}
   .t-art{width:46px;height:46px;border-radius:11px}
   .t-title{font-size:13px}
   .bar{padding:0 14px}
-  .sh-body{padding:4px 18px 8px}
-  .vin-wrap{width:44vw;max-width:175px;margin-bottom:8px}
-  .vin-glow{inset:-16px}
-  .sh-song{margin-bottom:6px}
-  .sh-title{font-size:1.35rem;margin-bottom:5px}
-  .sh-lang{font-size:8px;padding:2px 6px}
-  .sh-viz{height:22px;margin-bottom:6px}
-  .sh-prog{margin-bottom:6px}
-  .prow{height:20px;margin-bottom:4px}
-  .pthumb{width:13px;height:13px}
-  .sh-ctrl{margin-bottom:6px;gap:4px}
-  .cplay{width:54px;height:54px}
-  .cplay svg{width:22px;height:22px}
-  .cskip{width:40px;height:40px}
-  .cskip svg{width:18px;height:18px}
-  .ctr{width:34px;height:34px}
-  .ctr svg{width:16px;height:16px}
-  .sh-vol{gap:8px}
-  .queue-btn{margin-top:6px;padding:7px 12px;font-size:11px;border-radius:10px}
 }
 @media(min-width:700px){
   .hdr{padding:60px 48px 28px}
   .plist{padding:0 36px 8px}
   .bar{padding:0 36px}
-  .sh-body{padding:8px 48px 24px}
-  .vin-wrap{width:50vw;max-width:300px;margin-bottom:24px}
-  .sh-song{margin-bottom:18px}
-  .sh-viz{height:38px;margin-bottom:16px}
-  .sh-prog{margin-bottom:18px}
-  .sh-ctrl{margin-bottom:18px}
 }
 </style>
 </head>
@@ -579,7 +553,7 @@ function togglePlay(){
 function next(){qpos=(qpos+1)%queue.length;playIdx(qpos)}
 function prev(){if(audio.currentTime>3){audio.currentTime=0;return}qpos=(qpos-1+queue.length)%queue.length;playIdx(qpos)}
 
-function openSheet(){sheet.classList.add('open')}
+function openSheet(){sheet.classList.add('open');requestAnimationFrame(adaptSheet)}
 function closeSheet(){sheet.classList.remove('open');sheet.style.transform=''}
 function openQueue(){renderQueue();qscreen.classList.add('open')}
 function closeQueue(){qscreen.classList.remove('open')}
@@ -877,6 +851,71 @@ SONGS.forEach((s,i)=>{
 });
 
 renderList();renderQueue();
+
+// ── ADAPTIVE SHEET LAYOUT ──
+// Measures actual screen and sets CSS vars proportionally so sheet
+// fits perfectly on every phone without scrolling.
+function adaptSheet(){
+  var sh    = window.innerHeight;  // true screen height in CSS px
+  var sw    = window.innerWidth;
+
+  // Total fixed chrome outside the vinyl:
+  //   handle area: 42px
+  //   song title+tag: ~52px
+  //   visualizer: dynamic
+  //   progress bar: 56px  (prow 26 + trow 16 + margin)
+  //   controls row: dynamic
+  //   volume row: 28px
+  //   queue button: dynamic
+  //   sh-body padding top+bottom: ~16px
+  // We'll derive everything from sh (screen height).
+
+  // Decide scale tier
+  var small  = sh < 680;   // SE, old Android
+  var medium = sh < 800;   // most iPhones, average Android
+  // large = everything else (tall phones, tablets)
+
+  // Gap between sections
+  var gap = small ? 6 : medium ? 10 : 14;
+
+  // Vinyl: give it 28-34% of screen height
+  var vinPct = small ? 0.27 : medium ? 0.30 : 0.33;
+  var vinMax  = small ? 160  : medium ? 210  : 260;
+  var vinSide = Math.min(Math.round(sh * vinPct), vinMax, Math.round(sw * 0.55));
+  vinSide = Math.max(vinSide, 110);
+
+  // Visualizer height
+  var vizH = small ? 20 : medium ? 26 : 34;
+
+  // Controls
+  var playSize = small ? 52 : medium ? 62 : 72;
+  var playIcon = Math.round(playSize * 0.42);
+  var skipSize = small ? 38 : medium ? 44 : 50;
+  var ctrlGap  = small ? 4  : medium ? 6  : 8;
+
+  // Title font
+  var titleSize = small ? '1.25rem' : medium ? '1.5rem' : '1.9rem';
+
+  // Side padding on sh-body
+  var px = sw < 360 ? 14 : sw < 420 ? 20 : 28;
+
+  // Apply as CSS custom props on root
+  var r = document.documentElement.style;
+  r.setProperty('--vin-size',        vinSide + 'px');
+  r.setProperty('--sh-gap',          gap + 'px');
+  r.setProperty('--sh-viz-h',        vizH + 'px');
+  r.setProperty('--sh-play-size',    playSize + 'px');
+  r.setProperty('--sh-play-icon',    playIcon + 'px');
+  r.setProperty('--sh-skip-size',    skipSize + 'px');
+  r.setProperty('--sh-ctrl-gap',     ctrlGap + 'px');
+  r.setProperty('--sh-title-size',   titleSize);
+  r.setProperty('--sh-px',           px + 'px');
+  var ctrSize = small ? 34 : medium ? 38 : 42;
+  r.setProperty('--sh-ctr-size',     ctrSize + 'px');
+}
+
+adaptSheet();
+window.addEventListener('resize', adaptSheet);
 })();
 </script>
 </body>
