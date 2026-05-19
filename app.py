@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from groq import Groq
-import json
+from pymongo import MongoClient
 import os
 
 app = Flask(__name__)
 
-MEMORY_FILE = "memory.json"
 MAX_MEMORY_LENGTH = 100
 
 SYSTEM_PROMPT = (
@@ -19,18 +18,21 @@ SYSTEM_PROMPT = (
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-if not os.path.exists(MEMORY_FILE):
-    with open(MEMORY_FILE, "w") as f:
-        json.dump([], f)
+client_db = MongoClient(os.environ.get("MONGODB_URI"))
+db = client_db["headache"]
+collection = db["memory"]
 
 def load_memory():
-    with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    doc = collection.find_one({"_id": "chat"})
+    return doc["messages"] if doc else []
 
 def save_memory(memory):
     trimmed = memory[-MAX_MEMORY_LENGTH:]
-    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(trimmed, f, indent=2, ensure_ascii=False)
+    collection.update_one(
+        {"_id": "chat"},
+        {"$set": {"messages": trimmed}},
+        upsert=True
+    )
 
 def query_groq(memory):
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
