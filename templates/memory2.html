@@ -121,17 +121,11 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
 .sh-close:hover{color:var(--txt);background:rgba(255,255,255,.14)}
 .sh-close svg{width:18px;height:18px}
 
-.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:4px var(--sh-px,28px) 12px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;gap:0;-webkit-overflow-scrolling:touch}
+.sh-body{flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;padding:6px var(--sh-px,24px) 20px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .sh-body::-webkit-scrollbar{display:none}
 
 /* ── VINYL WRAP — tonearm is a SIBLING of the disc, not inside it ── */
-.vin-wrap{
-  position:relative;
-  width:var(--vin-size,200px);
-  height:var(--vin-size,200px);
-  flex-shrink:0;
-  margin-bottom:var(--sh-gap,12px);
-}
+.vin-wrap{position:relative;width:var(--vin-size,180px);height:var(--vin-size,180px);flex-shrink:0;margin-bottom:var(--sh-gap,12px)}
 
 .vin-glow{position:absolute;inset:-40px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(201,168,76,.22),rgba(90,60,180,.14),transparent 70%);opacity:0;transition:opacity 1.2s}
 .vin-glow.on{opacity:1;animation:gbreathing 4s ease-in-out infinite}
@@ -307,8 +301,8 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:v
   .hdr{padding:60px 48px 28px}
   .plist{padding:0 36px 8px}
   .bar{padding:0 36px}
-}
-</style>
+  .sh-body{padding:8px 40px 24px}
+}</style>
 </head>
 <body>
 <div class="app" id="app">
@@ -852,68 +846,32 @@ SONGS.forEach((s,i)=>{
 
 renderList();renderQueue();
 
-// ── ADAPTIVE SHEET LAYOUT ──
-// Measures actual screen and sets CSS vars proportionally so sheet
-// fits perfectly on every phone without scrolling.
+// Size vinyl proportionally to screen
 function adaptSheet(){
-  var sh    = window.innerHeight;  // true screen height in CSS px
-  var sw    = window.innerWidth;
-
-  // Total fixed chrome outside the vinyl:
-  //   handle area: 42px
-  //   song title+tag: ~52px
-  //   visualizer: dynamic
-  //   progress bar: 56px  (prow 26 + trow 16 + margin)
-  //   controls row: dynamic
-  //   volume row: 28px
-  //   queue button: dynamic
-  //   sh-body padding top+bottom: ~16px
-  // We'll derive everything from sh (screen height).
-
-  // Decide scale tier
-  var small  = sh < 680;   // SE, old Android
-  var medium = sh < 800;   // most iPhones, average Android
-  // large = everything else (tall phones, tablets)
-
-  // Gap between sections
-  var gap = small ? 6 : medium ? 10 : 14;
-
-  // Vinyl: give it 28-34% of screen height
-  var vinPct = small ? 0.27 : medium ? 0.30 : 0.33;
-  var vinMax  = small ? 160  : medium ? 210  : 260;
-  var vinSide = Math.min(Math.round(sh * vinPct), vinMax, Math.round(sw * 0.55));
-  vinSide = Math.max(vinSide, 110);
-
-  // Visualizer height
-  var vizH = small ? 20 : medium ? 26 : 34;
-
-  // Controls
-  var playSize = small ? 52 : medium ? 62 : 72;
-  var playIcon = Math.round(playSize * 0.42);
-  var skipSize = small ? 38 : medium ? 44 : 50;
-  var ctrlGap  = small ? 4  : medium ? 6  : 8;
-
-  // Title font
-  var titleSize = small ? '1.25rem' : medium ? '1.5rem' : '1.9rem';
-
-  // Side padding on sh-body
-  var px = sw < 360 ? 14 : sw < 420 ? 20 : 28;
-
-  // Apply as CSS custom props on root
+  var h = window.innerHeight;
+  var w = window.innerWidth;
+  // vinyl = 30% of screen height, capped at 210px, min 110px
+  var vin = Math.max(110, Math.min(Math.round(h * 0.30), 210, Math.round(w * 0.55)));
+  var gap = h < 680 ? '7px' : h < 820 ? '10px' : '14px';
+  var play = h < 680 ? '54px' : h < 820 ? '62px' : '72px';
+  var playIcon = h < 680 ? '22px' : h < 820 ? '26px' : '30px';
+  var skip = h < 680 ? '40px' : h < 820 ? '46px' : '50px';
+  var ctr  = h < 680 ? '34px' : h < 820 ? '38px' : '42px';
+  var viz  = h < 680 ? '20px' : h < 820 ? '26px' : '32px';
+  var px   = w < 360 ? '16px' : w < 420 ? '22px' : '28px';
+  var title= h < 680 ? '1.25rem' : h < 820 ? '1.5rem' : '1.9rem';
   var r = document.documentElement.style;
-  r.setProperty('--vin-size',        vinSide + 'px');
-  r.setProperty('--sh-gap',          gap + 'px');
-  r.setProperty('--sh-viz-h',        vizH + 'px');
-  r.setProperty('--sh-play-size',    playSize + 'px');
-  r.setProperty('--sh-play-icon',    playIcon + 'px');
-  r.setProperty('--sh-skip-size',    skipSize + 'px');
-  r.setProperty('--sh-ctrl-gap',     ctrlGap + 'px');
-  r.setProperty('--sh-title-size',   titleSize);
-  r.setProperty('--sh-px',           px + 'px');
-  var ctrSize = small ? 34 : medium ? 38 : 42;
-  r.setProperty('--sh-ctr-size',     ctrSize + 'px');
+  r.setProperty('--vin-size', vin+'px');
+  r.setProperty('--sh-gap', gap);
+  r.setProperty('--sh-play-size', play);
+  r.setProperty('--sh-play-icon', playIcon);
+  r.setProperty('--sh-skip-size', skip);
+  r.setProperty('--sh-ctr-size', ctr);
+  r.setProperty('--sh-viz-h', viz);
+  r.setProperty('--sh-px', px);
+  r.setProperty('--sh-title-size', title);
+  r.setProperty('--sh-ctrl-gap', h < 680 ? '4px' : '7px');
 }
-
 adaptSheet();
 window.addEventListener('resize', adaptSheet);
 })();
