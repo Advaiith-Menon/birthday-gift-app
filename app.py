@@ -314,10 +314,10 @@ def chat():
     past_sessions = load_past_sessions()
     bag           = load_bag()
 
-    # ── Session expired → archive, summarise, start fresh ──
+    # ── Session expired → summarise for AI context, start fresh ──
+    # No need to archive here anymore — messages were already archived in real time
     if session_expired(session):
-        print(f"[SESSION] Gap detected — archiving {len(session)} messages")
-        append_to_archive(session)
+        print(f"[SESSION] Gap detected — summarising {len(session)} messages")
         summary = summarise_session(session)
         if summary:
             past_sessions.append(summary)
@@ -326,12 +326,13 @@ def chat():
         clear_session()
         session = []
 
-    # Append user message
-    session.append({
+    # Build user message
+    user_entry = {
         "role":      "user",
         "content":   user_msg,
         "timestamp": now_ist()
-    })
+    }
+    session.append(user_entry)
 
     # Main Groq call
     try:
@@ -340,14 +341,21 @@ def chat():
         print(f"[GROQ] {type(e).__name__}: {e}")
         return jsonify({"reply": "Ugh. I zoned out again..."}), 500
 
-    # Append bot reply
-    session.append({
+    # Build bot reply
+    bot_entry = {
         "role":      "assistant",
         "content":   bot_reply,
         "timestamp": now_ist()
-    })
+    }
+    session.append(bot_entry)
 
+    # Save session for AI context
     save_session(session)
+
+    # Archive both messages immediately — real time, every single exchange
+    append_to_archive([user_entry, bot_entry])
+
+    # Auto-fill bag
     extract_and_save_bag(user_msg, bot_reply, bag)
 
     return jsonify({"reply": bot_reply})
