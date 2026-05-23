@@ -428,6 +428,38 @@ def memory_n(n):
 def get_image(filename):
     return send_from_directory(os.path.join(app.root_path, "static"), filename)
 
+################################################################################################
+@app.route("/admin/summarise-archive-full", methods=["POST"])
+def summarise_archive_full():
+    """ONE-TIME: chunk entire archive and summarise into sessions."""
+    doc = col.find_one({"_id": "archive"}) or {}
+    messages = doc.get("messages", [])
+    if not messages:
+        return jsonify({"ok": False, "msg": "archive is empty"})
+
+    chunk_size = 20
+    chunks = [messages[i:i+chunk_size] for i in range(0, len(messages), chunk_size)]
+    summaries = []
+
+    for i, chunk in enumerate(chunks):
+        print(f"[SUMMARISE] Chunk {i+1}/{len(chunks)}...")
+        summary = summarise_session(chunk)
+        if summary:
+            summaries.append(summary)
+
+    # Save all — temporarily bypass MAX_PAST_SUMMARIES limit
+    col.update_one(
+        {"_id": "sessions"},
+        {"$set": {"past": summaries}},
+        upsert=True
+    )
+
+    return jsonify({
+        "ok": True,
+        "total_messages": len(messages),
+        "chunks": len(chunks),
+        "summaries_saved": len(summaries)
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
