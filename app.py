@@ -11,9 +11,8 @@ app = Flask(__name__)
 # ══════════════════════════════════════
 MAX_BAG_SIZE        = 100
 MAX_PAST_SUMMARIES  = 5
-MAX_ARCHIVE_LENGTH  = 1000  # max messages kept in permanent archive
-SESSION_GAP_MINUTES = 120   # 2 hr gap → new session
-
+MAX_ARCHIVE_LENGTH  = 1000
+SESSION_GAP_MINUTES = 120
 
 SYSTEM_PROMPT = (
     "You are Headache — witty, sarcastic, fake-deep, emotionally intelligent, "
@@ -77,7 +76,6 @@ SYSTEM_PROMPT = (
     "Never break character."
 )
 
-
 # ══════════════════════════════════════
 #  CLIENTS
 # ══════════════════════════════════════
@@ -110,17 +108,12 @@ def load_session():
     return doc["messages"] if doc else []
 
 def save_session(messages):
-    col.update_one(
-        {"_id": "chat"},
-        {"$set": {"messages": messages}},
-        upsert=True
-    )
+    col.update_one({"_id": "chat"}, {"$set": {"messages": messages}}, upsert=True)
 
 def clear_session():
     col.update_one({"_id": "chat"}, {"$set": {"messages": []}}, upsert=True)
 
 def session_expired(messages):
-    """True if last message was more than SESSION_GAP_MINUTES ago."""
     if not messages:
         return False
     ts = parse_ist(messages[-1].get("timestamp", ""))
@@ -131,14 +124,8 @@ def session_expired(messages):
 
 # ══════════════════════════════════════
 #  ARCHIVE  (_id: "archive")
-#  — permanent raw message log
 # ══════════════════════════════════════
 def append_to_archive(messages):
-    """
-    Append new messages to the permanent archive.
-    If archive exceeds MAX_ARCHIVE_LENGTH, trim oldest to make room
-    before appending — so the latest messages always survive.
-    """
     if not messages:
         return
     doc     = col.find_one({"_id": "archive"}) or {}
@@ -150,11 +137,7 @@ def append_to_archive(messages):
         archive = archive[-trim_to:] if trim_to > 0 else []
         print(f"[ARCHIVE] Trimmed to {len(archive)} — making room for {slots_needed} new messages")
     archive.extend(messages)
-    col.update_one(
-        {"_id": "archive"},
-        {"$set": {"messages": archive}},
-        upsert=True
-    )
+    col.update_one({"_id": "archive"}, {"$set": {"messages": archive}}, upsert=True)
     print(f"[ARCHIVE] {len(messages)} messages saved — total: {len(archive)}/{MAX_ARCHIVE_LENGTH}")
 
 
@@ -173,7 +156,6 @@ def save_past_sessions(past):
     )
 
 def summarise_session(messages):
-    """Ask Groq to compress a whole session into ~3 sentences."""
     if not messages:
         return None
     convo = "\n".join(
@@ -208,10 +190,7 @@ def summarise_session(messages):
 def past_sessions_as_context(past):
     if not past:
         return ""
-    lines = [
-        f"[{s['timestamp']}] {s['summary']}"
-        for s in past[-3:]
-    ]
+    lines = [f"[{s['timestamp']}] {s['summary']}" for s in past[-3:]]
     return "\n\nPAST SESSION SUMMARIES:\n" + "\n\n".join(lines)
 
 
@@ -229,8 +208,7 @@ def bag_as_context(bag):
     if not bag:
         return ""
     notes = "\n".join(
-        f"- {n['content'] if isinstance(n, dict) else n}"
-        for n in bag
+        f"- {n['content'] if isinstance(n, dict) else n}" for n in bag
     )
     return f"\n\nIMPORTANT PERMANENT MEMORY:\n{notes}"
 
@@ -314,8 +292,6 @@ def chat():
     past_sessions = load_past_sessions()
     bag           = load_bag()
 
-    # ── Session expired → summarise for AI context, start fresh ──
-    # No need to archive here anymore — messages were already archived in real time
     if session_expired(session):
         print(f"[SESSION] Gap detected — summarising {len(session)} messages")
         summary = summarise_session(session)
@@ -326,43 +302,55 @@ def chat():
         clear_session()
         session = []
 
-    # Build user message
-    user_entry = {
-        "role":      "user",
-        "content":   user_msg,
-        "timestamp": now_ist()
-    }
+    user_entry = {"role": "user", "content": user_msg, "timestamp": now_ist()}
     session.append(user_entry)
 
-    # Main Groq call
     try:
         bot_reply = query_groq(session, past_sessions, bag)
     except Exception as e:
         print(f"[GROQ] {type(e).__name__}: {e}")
         return jsonify({"reply": "Ugh. I zoned out again..."}), 500
 
-    # Build bot reply
-    bot_entry = {
-        "role":      "assistant",
-        "content":   bot_reply,
-        "timestamp": now_ist()
-    }
+    bot_entry = {"role": "assistant", "content": bot_reply, "timestamp": now_ist()}
     session.append(bot_entry)
 
-    # Save session for AI context
     save_session(session)
-
-    # Archive both messages immediately — real time, every single exchange
     append_to_archive([user_entry, bot_entry])
-
-    # Auto-fill bag
     extract_and_save_bag(user_msg, bot_reply, bag)
 
     return jsonify({"reply": bot_reply})
 
 
-# ── Bag API ──
+# ══════════════════════════════════════
+#  ADMIN ROUTES
+# ══════════════════════════════════════
+@app.route("/admin/sync-archive", methods=["POST"])
+def sync_archive():
+    """Copy everything currently in chat to archive."""
+    session = load_session()
+    if not session:
+        return jsonify({"ok": False, "msg": "chat is empty"})
+    append_to_archive(session)
+    return jsonify({"ok": True, "synced": len(session)})
 
+@app.route("/admin/summarise-now", methods=["POST"])
+def summarise_now():
+    """Manually summarise current chat and clear it."""
+    session       = load_session()
+    past_sessions = load_past_sessions()
+    if not session:
+        return jsonify({"ok": False, "msg": "chat is empty"})
+    summary = summarise_session(session)
+    if summary:
+        past_sessions.append(summary)
+        save_past_sessions(past_sessions)
+    clear_session()
+    return jsonify({"ok": True, "summary": summary["summary"] if summary else None})
+
+
+# ══════════════════════════════════════
+#  BAG API
+# ══════════════════════════════════════
 @app.route("/bag", methods=["GET"])
 def get_bag():
     return jsonify({"notes": load_bag()})
@@ -394,8 +382,9 @@ def clear_bag():
     return jsonify({"ok": True})
 
 
-# ── Archive API ──
-
+# ══════════════════════════════════════
+#  ARCHIVE API
+# ══════════════════════════════════════
 @app.route("/archive", methods=["GET"])
 def get_archive():
     doc = col.find_one({"_id": "archive"}) or {}
@@ -407,8 +396,9 @@ def clear_archive():
     return jsonify({"ok": True})
 
 
-# ── Sessions API ──
-
+# ══════════════════════════════════════
+#  SESSIONS API
+# ══════════════════════════════════════
 @app.route("/sessions", methods=["GET"])
 def get_sessions():
     return jsonify({"past": load_past_sessions()})
@@ -419,8 +409,9 @@ def clear_sessions():
     return jsonify({"ok": True})
 
 
-# ── Page routes ──
-
+# ══════════════════════════════════════
+#  PAGE ROUTES
+# ══════════════════════════════════════
 @app.route("/aadhi")
 def unlock():
     return render_template("aadhi.html")
