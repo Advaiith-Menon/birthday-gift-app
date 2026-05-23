@@ -387,6 +387,14 @@ def clear_bag():
 
 
 # ── Archive API ──
+@app.route("/migrate-chat-to-archive", methods=["POST"])
+def migrate_chat_to_archive():
+    chat_doc = col.find_one({"_id": "chat"}) or {}
+    messages = chat_doc.get("messages", [])
+    if not messages:
+        return jsonify({"ok": False, "msg": "chat is empty"})
+    append_to_archive(messages)
+    return jsonify({"ok": True, "migrated": len(messages)})
 
 @app.route("/archive", methods=["GET"])
 def get_archive():
