@@ -287,7 +287,7 @@ def query_groq(session, past_sessions, bag):
     for m in session:
         messages.append({"role": m["role"], "content": m["content"]})
     resp = groq_client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="llama-3.3-70b-versatile",
         max_tokens=200,
         messages=messages
     )
