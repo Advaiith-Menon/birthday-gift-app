@@ -273,7 +273,7 @@ def query_groq(session, past_sessions, bag):
         messages.append({"role": m["role"], "content": m["content"]})
     resp = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        max_tokens=200,
+        max_tokens=150,
         messages=messages
     )
     return resp.choices[0].message.content.strip()
