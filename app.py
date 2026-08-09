@@ -17,6 +17,7 @@ MAX_ARCHIVE_LENGTH  = 1000
 SESSION_GAP_MINUTES = 120
 memory_executor = ThreadPoolExecutor(max_workers=1)
 chat_lock = threading.Lock()
+developer_mode = False
 
 SYSTEM_PROMPT = (
     "You are Headache — Aadhi's sarcastic, teasing, emotionally intelligent best friend. "
@@ -272,7 +273,7 @@ def query_groq(session, past_sessions, bag):
     for m in session:
         messages.append({"role": m["role"], "content": m["content"]})
     resp = groq_client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="llama-3.1-8b-instant",
         max_tokens=150,
         messages=messages
     )
@@ -300,11 +301,27 @@ def chat():
     if user_msg.lower() == "true love":
         return jsonify({"reply": "__UNLOCK__"})
 
+    global developer_mode
+
+    if user_msg.lower() == "/devmode":
+        developer_mode = not developer_mode
+
+        status = "enabled" if developer_mode else "disabled"
+
+        return jsonify({
+            "reply": f"Developer mode {status}."
+        })
+
     with chat_lock:
 
-        session       = load_session()
-        past_sessions = load_past_sessions()
-        bag           = load_bag()
+        if developer_mode:
+            session = []
+            past_sessions = []
+            bag = load_bag()
+        else:
+            session       = load_session()
+            past_sessions = load_past_sessions()
+            bag           = load_bag()
 
         if session_expired(session):
             print(f"[SESSION] Gap detected — summarising {len(session)} messages")
@@ -342,15 +359,17 @@ def chat():
 
         session.append(bot_entry)
 
-        save_session(session)
-        append_to_archive([user_entry, bot_entry])
+        if not developer_mode:
+            save_session(session)
+            append_to_archive([user_entry, bot_entry])
 
     # Outside the lock — doesn't make Aadhi wait
-    memory_executor.submit(
-        process_memory_in_background,
-        user_msg,
-        bot_reply
-    )
+    if not developer_mode:
+        memory_executor.submit(
+            process_memory_in_background,
+            user_msg,
+            bot_reply
+        )
 
     return jsonify({"reply": bot_reply})
 
