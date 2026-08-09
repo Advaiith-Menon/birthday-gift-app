@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from groq import Groq
 from pymongo import MongoClient
 from datetime import datetime, timezone, timedelta
+import time
 import threading
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -293,6 +294,7 @@ def process_memory_in_background(user_msg, bot_reply):
 
 @app.route("/chat", methods=["POST"])
 def chat():
+    request_start = time.time()
     user_msg = request.json.get("message", "").strip()
 
     if not user_msg:
@@ -343,9 +345,11 @@ def chat():
         }
 
         session.append(user_entry)
+        start = time.time()
 
         try:
             bot_reply = query_groq(session, past_sessions, bag)
+            print(f"[TIMING] Groq: {time.time() - start:.2f}s")
 
         except Exception as e:
             print(f"[GROQ] {type(e).__name__}: {e}")
@@ -370,7 +374,8 @@ def chat():
             user_msg,
             bot_reply
         )
-
+    print(f"[TIMING] Total: {time.time() - request_start:.2f}s")
+    
     return jsonify({"reply": bot_reply})
 
 # ══════════════════════════════════════
