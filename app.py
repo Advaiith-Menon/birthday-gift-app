@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from groq import Groq
 from pymongo import MongoClient
 from datetime import datetime, timezone, timedelta
+import threading
 import os
 from concurrent.futures import ThreadPoolExecutor
 
@@ -15,6 +16,7 @@ MAX_PAST_SUMMARIES  = 5
 MAX_ARCHIVE_LENGTH  = 1000
 SESSION_GAP_MINUTES = 120
 memory_executor = ThreadPoolExecutor(max_workers=1)
+chat_lock = threading.Lock()
 
 SYSTEM_PROMPT = (
     "You are Headache — Aadhi's sarcastic, teasing, emotionally intelligent best friend. "
@@ -291,48 +293,66 @@ def process_memory_in_background(user_msg, bot_reply):
 @app.route("/chat", methods=["POST"])
 def chat():
     user_msg = request.json.get("message", "").strip()
+
     if not user_msg:
         return jsonify({"reply": "Say something, Aadhi..."}), 400
+
     if user_msg.lower() == "true love":
         return jsonify({"reply": "__UNLOCK__"})
 
-    session       = load_session()
-    past_sessions = load_past_sessions()
-    bag           = load_bag()
+    with chat_lock:
 
-    if session_expired(session):
-        print(f"[SESSION] Gap detected — summarising {len(session)} messages")
-        summary = summarise_session(session)
-        if summary:
-            past_sessions.append(summary)
-            save_past_sessions(past_sessions)
-            print(f"[SESSION] Summarised: {summary['summary'][:60]}...")
-        clear_session()
-        session = []
+        session       = load_session()
+        past_sessions = load_past_sessions()
+        bag           = load_bag()
 
-    user_entry = {"role": "user", "content": user_msg, "timestamp": now_ist()}
-    session.append(user_entry)
+        if session_expired(session):
+            print(f"[SESSION] Gap detected — summarising {len(session)} messages")
 
-    try:
-        bot_reply = query_groq(session, past_sessions, bag)
-    except Exception as e:
-        print(f"[GROQ] {type(e).__name__}: {e}")
-        return jsonify({"reply": "Ugh. I zoned out again..."}), 500
+            summary = summarise_session(session)
 
-    bot_entry = {"role": "assistant", "content": bot_reply, "timestamp": now_ist()}
-    session.append(bot_entry)
+            if summary:
+                past_sessions.append(summary)
+                save_past_sessions(past_sessions)
+                print(f"[SESSION] Summarised: {summary['summary'][:60]}...")
 
-    save_session(session)
-    append_to_archive([user_entry, bot_entry])
+            clear_session()
+            session = []
 
+        user_entry = {
+            "role": "user",
+            "content": user_msg,
+            "timestamp": now_ist()
+        }
+
+        session.append(user_entry)
+
+        try:
+            bot_reply = query_groq(session, past_sessions, bag)
+
+        except Exception as e:
+            print(f"[GROQ] {type(e).__name__}: {e}")
+            return jsonify({"reply": "Ugh. I zoned out again..."}), 500
+
+        bot_entry = {
+            "role": "assistant",
+            "content": bot_reply,
+            "timestamp": now_ist()
+        }
+
+        session.append(bot_entry)
+
+        save_session(session)
+        append_to_archive([user_entry, bot_entry])
+
+    # Outside the lock — doesn't make Aadhi wait
     memory_executor.submit(
         process_memory_in_background,
         user_msg,
         bot_reply
-)
+    )
 
     return jsonify({"reply": bot_reply})
-
 
 # ══════════════════════════════════════
 #  ADMIN ROUTES
