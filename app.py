@@ -3,6 +3,7 @@ from groq import Groq
 from pymongo import MongoClient
 from datetime import datetime, timezone, timedelta
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 app = Flask(__name__)
 
@@ -13,6 +14,7 @@ MAX_BAG_SIZE        = 100
 MAX_PAST_SUMMARIES  = 5
 MAX_ARCHIVE_LENGTH  = 1000
 SESSION_GAP_MINUTES = 120
+memory_executor = ThreadPoolExecutor(max_workers=1)
 
 SYSTEM_PROMPT = (
     "You are Headache — Aadhi's sarcastic, teasing, emotionally intelligent best friend. "
@@ -282,6 +284,9 @@ def query_groq(session, past_sessions, bag):
 def home():
     return render_template("index.html")
 
+def process_memory_in_background(user_msg, bot_reply):
+    bag = load_bag()
+    extract_and_save_bag(user_msg, bot_reply, bag)
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -319,7 +324,12 @@ def chat():
 
     save_session(session)
     append_to_archive([user_entry, bot_entry])
-    extract_and_save_bag(user_msg, bot_reply, bag)
+
+    memory_executor.submit(
+        process_memory_in_background,
+        user_msg,
+        bot_reply
+)
 
     return jsonify({"reply": bot_reply})
 
