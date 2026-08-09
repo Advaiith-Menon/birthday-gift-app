@@ -316,14 +316,30 @@ def chat():
 
     with chat_lock:
 
+        load_start = time.time()
+
         if developer_mode:
             session = []
             past_sessions = []
+
+            bag_start = time.time()
             bag = load_bag()
+            print(f"[TIMING] Load bag: {time.time() - bag_start:.2f}s")
+
         else:
-            session       = load_session()
+            session_start = time.time()
+            session = load_session()
+            print(f"[TIMING] Load session: {time.time() - session_start:.2f}s")
+
+            past_start = time.time()
             past_sessions = load_past_sessions()
-            bag           = load_bag()
+            print(f"[TIMING] Load past sessions: {time.time() - past_start:.2f}s")
+
+            bag_start = time.time()
+            bag = load_bag()
+            print(f"[TIMING] Load bag: {time.time() - bag_start:.2f}s")
+
+        print(f"[TIMING] All loads: {time.time() - load_start:.2f}s")
 
         if session_expired(session):
             print(f"[SESSION] Gap detected — summarising {len(session)} messages")
@@ -364,8 +380,17 @@ def chat():
         session.append(bot_entry)
 
         if not developer_mode:
+            save_start = time.time()
+
+            session_start = time.time()
             save_session(session)
+            print(f"[TIMING] Save session: {time.time() - session_start:.2f}s")
+
+            archive_start = time.time()
             append_to_archive([user_entry, bot_entry])
+            print(f"[TIMING] Save archive: {time.time() - archive_start:.2f}s")
+
+            print(f"[TIMING] All saves: {time.time() - save_start:.2f}s")
 
     # Outside the lock — doesn't make Aadhi wait
     if not developer_mode:
@@ -375,7 +400,7 @@ def chat():
             bot_reply
         )
     print(f"[TIMING] Total: {time.time() - request_start:.2f}s")
-    
+
     return jsonify({"reply": bot_reply})
 
 # ══════════════════════════════════════
