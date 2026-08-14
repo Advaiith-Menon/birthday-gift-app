@@ -313,7 +313,7 @@ def summarise_session(messages):
     )
     try:
         resp = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-instant",
             max_tokens=150,
             messages=[
                 {
