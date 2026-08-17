@@ -431,6 +431,7 @@ def query_groq(session, past_sessions, bag):
         max_tokens=150,
         messages=messages
     )
+    
     return resp.choices[0].message.content.strip()
 
 
