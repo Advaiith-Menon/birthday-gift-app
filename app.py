@@ -313,7 +313,7 @@ def summarise_session(messages):
     )
     try:
         resp = groq_client.chat.completions.create(
-            model="llama-3.3-70b-instant",
+            model="openai/gpt-oss-120b",
             max_tokens=150,
             messages=[
                 {
@@ -427,7 +427,7 @@ def query_groq(session, past_sessions, bag):
     for m in session:
         messages.append({"role": m["role"], "content": m["content"]})
     resp = groq_client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         max_tokens=150,
         messages=messages
     )
